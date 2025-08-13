@@ -1,0 +1,7 @@
+CREATE TABLE "users" (
+  "id" BIGINT PRIMARY KEY,
+  "name" VARCHAR,
+  "hashed_password" VARCHAR NOT NULL DEFAULT '12345678',
+  "email" VARCHAR UNIQUE NOT NULL,
+  "created_at" "TIMESTAMPTZ" NOT NULL DEFAULT (NOW())
+);
