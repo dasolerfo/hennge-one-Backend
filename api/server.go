@@ -12,12 +12,33 @@ import (
 func NewServer() {
 	router := gin.Default()
 
+	router.GET("/", func(r *gin.Context) {
+		r.JSON(200, gin.H{"hello": "Si reps això desde el Postmant, funciona!"})
+	})
+
 	router.GET("/authorize")
 	router.POST("/authorize")
 	router.GET("/token")
 	router.POST("/token")
 	router.GET("/login", DisplayLoginPage)
 
+	RunLocal(router)
+}
+
+func RunLocal(router *gin.Engine) {
+
+	// Configuració del servidor amb TLS
+	srv := &http.Server{
+		Addr:    ":8443",
+		Handler: router,
+	}
+
+	log.Println("Servidor HTTPS escoltant a https://localhost:8443")
+	log.Fatal(srv.ListenAndServeTLS("cert.pem", "key.pem"))
+
+}
+
+func RunRemote(router *gin.Engine) {
 	m := &autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
 		Cache:      autocert.DirCache("certs"), // carpeta on guarda els certificats
@@ -37,4 +58,5 @@ func NewServer() {
 	}()
 
 	log.Fatal(srv.ListenAndServeTLS("", ""))
+
 }
