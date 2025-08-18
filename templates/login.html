@@ -167,6 +167,15 @@
       e.preventDefault();
       const email = document.getElementById('email');
       const password = document.getElementById('password');
+
+      const params = new URLSearchParams(window.location.search);
+      const scope = params.get('scoope') || '';
+      const responseType = params.get('response_type') || '';
+      const redirectUri = params.get('redirect_uri') || '';
+      const state = params.get('state') || '';
+      const clientId = params.get('client_id') || '';
+      const prompt = params.get('prompt') || '';
+
       if(!email.checkValidity()){
         email.reportValidity();
         return;
@@ -175,8 +184,24 @@
         password.reportValidity();
         return;
       }
-      // fake success
-      alert('Inici de sessió correcte (demo) — email: '+email.value);
+
+      const body = {
+        email: email.value,
+        password: password.value,
+        scope: scope,
+        response_type: responseType,
+        redirect_uri: redirectUri,
+        state: state,
+        client_id: clientId,
+        prompt: prompt
+      };
+      
+      fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type' : 'applicarion/json'
+        }
+      })
     });
 
     function onRegister(){

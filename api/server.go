@@ -6,12 +6,17 @@ import (
 	"net/http"
 
 	"github.com/dasolerfo/hennge-one-Backend.git/help"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/acme/autocert"
 )
 
 func NewServer(config *help.Config) {
 	router := gin.Default()
+
+	store := cookie.NewStore([]byte(config.SessionKey))
+	router.Use(sessions.Sessions("session_active", store))
 
 	router.GET("/", func(r *gin.Context) {
 		r.JSON(200, gin.H{"hello": "Si reps això desde el Postmant, funciona!"})

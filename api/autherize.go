@@ -1,6 +1,9 @@
 package api
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
+)
 
 type AuthorizeGetHandlerRequest struct {
 	Scope        string `uri:"scope" binding:"required"`
@@ -14,14 +17,23 @@ type AuthorizeGetHandlerRequest struct {
 func AuthorizeGetHandler(c *gin.Context) {
 	var req AuthorizeGetHandlerRequest
 	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request parameters"})
+		c.JSON(400, gin.H{"error_description": "Invalid request parameters"})
 		return
 	}
 
 	if req.Scope != "openid" {
-		c.JSON(400, gin.H{"error": "Invalid scope"})
+		c.JSON(400, gin.H{"error_description": "Invalid scope"})
 		return
 	}
+
+	session := sessions.Default(c)
+	token := session.Get("token")
+
+	if token != nil {
+
+	}
+
+	c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
 
 }
 
