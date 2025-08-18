@@ -5,11 +5,12 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/dasolerfo/hennge-one-Backend.git/help"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/acme/autocert"
 )
 
-func NewServer() {
+func NewServer(config *help.Config) {
 	router := gin.Default()
 
 	router.GET("/", func(r *gin.Context) {
