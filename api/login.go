@@ -15,6 +15,9 @@ func DisplayLoginPage(c *gin.Context) {
 	c.HTML(200, "login.html", gin.H{})
 }
 
+type LoginPostHandlerRequest struct {
+}
+
 func LoginPostHandler(c *gin.Context) {
 
 }
