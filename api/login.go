@@ -16,8 +16,20 @@ func DisplayLoginPage(c *gin.Context) {
 }
 
 type LoginPostHandlerRequest struct {
+	Email        string `json:"email" binding:"required,email"`
+	Password     string `json:"password" binding:"required"`
+	Scope        string `json:"scope" binding:"required"`
+	ResponseType string `json:"response_type" binding:"required"`
+	RedirectUri  string `json:"redirect_uri" binding:"required"`
+	State        string `json:"state"`
+	ClintId      string `json:"client_id" binding:"required"`
+	Prompt       string `json:"prompt"`
 }
 
 func LoginPostHandler(c *gin.Context) {
+	var req LoginPostHandlerRequest
+	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
+		c.HTML(400, "login.html", gin.H{"error": "Invalid request parameters"})
+	}
 
 }
