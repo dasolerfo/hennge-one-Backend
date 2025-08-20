@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	db "github.com/dasolerfo/hennge-one-Backend.git/db/model"
 	"github.com/dasolerfo/hennge-one-Backend.git/help"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -12,10 +13,28 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 )
 
-func NewServer(config *help.Config) {
+type Server struct {
+	Config help.Config
+	store  db.Store
+	router *gin.Engine
+}
+
+func NewServer(config *help.Config, store *db.Store) *Server {
+	server := &Server{
+		Config: *config,
+		store:  *store,
+	}
+
+	server.Router()
+
+	return server
+
+}
+
+func (server *Server) Router() {
 	router := gin.Default()
 
-	store := cookie.NewStore([]byte(config.SessionKey))
+	store := cookie.NewStore([]byte(server.Config.SessionKey))
 	router.Use(sessions.Sessions("session_active", store))
 
 	router.GET("/", func(r *gin.Context) {
@@ -26,9 +45,19 @@ func NewServer(config *help.Config) {
 	router.POST("/authorize")
 	router.GET("/token")
 	router.POST("/token")
-	router.GET("/login", DisplayLoginPage)
+	router.GET("/login", server.DisplayLoginPage)
 
-	RunLocal(router)
+	server.router = router
+
+	//RunLocal(router)
+}
+
+func (server *Server) Start() {
+	if server.Config.RunMode == "local" {
+		RunLocal(server.router)
+	} else {
+		RunRemote(server.router)
+	}
 }
 
 func RunLocal(router *gin.Engine) {
