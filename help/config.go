@@ -1,6 +1,8 @@
 package help
 
 import (
+	"time"
+
 	"github.com/spf13/viper"
 )
 
@@ -11,8 +13,9 @@ type Config struct {
 	//TokenDuration        time.Duration `mapstructure:"TOKEN_DURATION"`
 	//TokenSymmetricKey    string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
 	//RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
-	RunMode    string `mapstructure:"RUN_MODE"`
-	SessionKey string `mapstructure:"SESSION_KEY"`
+	RunMode            string        `mapstructure:"RUN_MODE"`
+	SessionKey         string        `mapstructure:"SESSION_KEY"`
+	CodeExpirationTime time.Duration `mapstructure:"CODE_EXPIRATION_TIME"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

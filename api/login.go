@@ -1,9 +1,15 @@
 package api
 
 import (
+	"strconv"
+
 	"github.com/dasolerfo/hennge-one-Backend.git/help"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+)
+
+const (
+	SessionCodeKey = "loggedCode"
 )
 
 type DisplayLoginPageRequest struct {
@@ -33,20 +39,25 @@ type LoginPostHandlerRequest struct {
 func (server *Server) LoginPostHandler(c *gin.Context) {
 	var req LoginPostHandlerRequest
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
-		c.HTML(400, "login.html", gin.H{"error": "Invalid request parameters"})
+		c.HTML(401, "login.html", gin.H{"error": "Invalid request parameters"})
 	}
 	user, err := server.store.GetUserByEmail(c.Request.Context(), req.Email)
 	if err != nil {
-		c.HTML(400, "login.html", gin.H{"error": "User not found"})
+		c.HTML(401, "login.html", gin.H{"error": "User not found"})
 		return
 	}
 
 	if err := help.CheckPassword(req.Password, user.HashedPassword); err != nil {
-		c.HTML(400, "login.html", gin.H{"error": "Invalid password"})
+		c.HTML(401, "login.html", gin.H{"error": "Invalid password"})
 		return
 	}
 
-	session := sessions.Default(c)
-	session.Set("user_id", user.ID)
+	id := strconv.FormatInt(user.ID, 10)
 
+	session := sessions.Default(c)
+	session.Set(SessionCodeKey, id)
+	session.Save()
+
+	c.Redirect(302, "/authorize?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
+	return
 }
