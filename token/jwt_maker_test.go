@@ -1,9 +1,10 @@
 package token
 
 import (
-	"simplebank/factory"
 	"testing"
 	"time"
+
+	"github.com/dasolerfo/hennge-one-Backend.git/help"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/require"
@@ -11,11 +12,11 @@ import (
 
 func TestJWTMaker(t *testing.T) {
 	// Create a new JWT maker
-	maker, err := NewJWTMaker(factory.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewJWTMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Test token creation and verification
-	email := factory.RandomString(32)
+	email := help.RandomString(32)
 	duration := time.Minute
 
 	issuedAt := time.Now()
@@ -41,11 +42,11 @@ func TestJWTMaker(t *testing.T) {
 
 func TestExpiredJWTToken(t *testing.T) {
 	// Create a new JWT maker
-	maker, err := NewJWTMaker(factory.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewJWTMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Test token creation with a short duration
-	email := factory.RandomString(32)
+	email := help.RandomString(32)
 	duration := -time.Minute // Negative duration to simulate expiration
 
 	token, payload, err := maker.CreateToken(email, duration)
@@ -62,7 +63,7 @@ func TestExpiredJWTToken(t *testing.T) {
 
 func TestInvalidJWTToken(t *testing.T) {
 	// Create a new JWT maker
-	maker, err := NewJWTMaker(factory.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewJWTMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Test with an invalid token
@@ -76,11 +77,11 @@ func TestInvalidJWTToken(t *testing.T) {
 
 func TestInvalidJWTAlgNoneToken(t *testing.T) {
 	// Create a new JWT maker
-	maker, err := NewJWTMaker(factory.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewJWTMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Create a token with "none" algorithm
-	payload, err := NewPayload(factory.RandomString(32), time.Minute)
+	payload, err := NewPayload(help.RandomString(32), time.Minute)
 	require.NoError(t, err)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodNone, payload)

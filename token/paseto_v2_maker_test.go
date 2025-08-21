@@ -1,9 +1,10 @@
 package token
 
 import (
-	"simplebank/factory"
 	"testing"
 	"time"
+
+	"github.com/dasolerfo/hennge-one-Backend.git/help"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/require"
@@ -11,11 +12,11 @@ import (
 
 func TestPasetoV2Maker(t *testing.T) {
 	// Create a new Paseto maker
-	maker, err := NewPasetoMaker(factory.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewPasetoMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Test token creation and verification
-	email := factory.RandomString(32)
+	email := help.RandomString(32)
 	duration := time.Minute
 
 	issuedAt := time.Now()
@@ -42,11 +43,11 @@ func TestPasetoV2Maker(t *testing.T) {
 
 func TestExpiredPasetoToken(t *testing.T) {
 	// Create a new Paseto maker
-	maker, err := NewPasetoMaker(factory.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewPasetoMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Test token creation with a short duration
-	email := factory.RandomString(32)
+	email := help.RandomString(32)
 	duration := -time.Minute // Negative duration to simulate expiration
 
 	token, payload, err := maker.CreateToken(email, duration)
@@ -63,7 +64,7 @@ func TestExpiredPasetoToken(t *testing.T) {
 
 func TestInvalidPasetoToken(t *testing.T) {
 	// Create a new Paseto maker
-	maker, err := NewPasetoMaker(factory.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewPasetoMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Test with an invalid token
@@ -77,11 +78,11 @@ func TestInvalidPasetoToken(t *testing.T) {
 
 func TestInvalidPasetoAlgNoneToken(t *testing.T) {
 	// Create a new JWT maker
-	maker, err := NewPasetoMaker(factory.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewPasetoMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Create a token with "none" algorithm
-	payload, err := NewPayload(factory.RandomString(32), time.Minute)
+	payload, err := NewPayload(help.RandomString(32), time.Minute)
 	require.NoError(t, err)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodNone, payload)
