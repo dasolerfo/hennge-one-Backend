@@ -1,6 +1,10 @@
 package api
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/dasolerfo/hennge-one-Backend.git/help"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
+)
 
 type DisplayLoginPageRequest struct {
 	Scope        string `uri:"scope" binding:"required"`
@@ -31,6 +35,18 @@ func (server *Server) LoginPostHandler(c *gin.Context) {
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
 		c.HTML(400, "login.html", gin.H{"error": "Invalid request parameters"})
 	}
-	server.store.
+	user, err := server.store.GetUserByEmail(c.Request.Context(), req.Email)
+	if err != nil {
+		c.HTML(400, "login.html", gin.H{"error": "User not found"})
+		return
+	}
+
+	if err := help.CheckPassword(req.Password, user.HashedPassword); err != nil {
+		c.HTML(400, "login.html", gin.H{"error": "Invalid password"})
+		return
+	}
+
+	session := sessions.Default(c)
+	session.Set("user_id", user.ID)
 
 }
