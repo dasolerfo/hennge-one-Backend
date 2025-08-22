@@ -2,11 +2,13 @@ package api
 
 import (
 	"crypto/tls"
+	"fmt"
 	"log"
 	"net/http"
 
 	db "github.com/dasolerfo/hennge-one-Backend.git/db/model"
 	"github.com/dasolerfo/hennge-one-Backend.git/help"
+	"github.com/dasolerfo/hennge-one-Backend.git/token"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -14,20 +16,27 @@ import (
 )
 
 type Server struct {
-	Config help.Config
-	store  db.Store
-	router *gin.Engine
+	Config     help.Config
+	tokenMaker token.Maker
+	store      db.Store
+	router     *gin.Engine
 }
 
-func NewServer(config *help.Config, store *db.Store) *Server {
+func NewServer(config *help.Config, store *db.Store) (*Server, error) {
+	tokenMaker, err := token.NewJWTMaker(config.TokenSymmetricKey)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create token maker: %v", err)
+	}
+
 	server := &Server{
-		Config: *config,
-		store:  *store,
+		tokenMaker: tokenMaker,
+		Config:     *config,
+		store:      *store,
 	}
 
 	server.Router()
 
-	return server
+	return server, nil
 
 }
 

@@ -1,6 +1,8 @@
 package api
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 func TokenGetHandler(c *gin.Context) {
 
@@ -37,6 +39,14 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 	}
 	if authCode.Scope.String != "openid" {
 		//Validar correctament l'error
+	}
+
+	idtoken, payload, err := server.tokenMaker.CreateIDToken(req.ClientID, authCode.Sub, []string{req.ClientID}, server.Config.TokenDuration)
+
+	response := &TokenPostHandlerResponse{
+		IdToken:    idtoken,
+		ExpiresIn:  payload.ExpiredAt,
+		TockenType: "Bearer",
 	}
 
 }
