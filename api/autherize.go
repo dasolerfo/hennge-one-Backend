@@ -23,7 +23,10 @@ type AuthorizeGetHandlerRequest struct {
 func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	var req AuthorizeGetHandlerRequest
 	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(400, gin.H{"error_description": "Invalid request parameters"})
+		c.JSON(400, gin.H{
+			"error":             "invalid_request",
+			"error_description": "Invalid request parameters",
+		})
 		return
 	}
 

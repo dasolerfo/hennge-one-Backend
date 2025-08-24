@@ -25,28 +25,53 @@ type TokenPostHandlerResponse struct {
 func (server *Server) TokenPostHandler(c *gin.Context) {
 	var req TokenPostHandlerRequest
 	if err := c.ShouldBind(&req); err != nil {
-		// TODO: Afegir la validació dels errors correctament
+		c.JSON(400, gin.H{
+			"error":             "invalid_request",
+			"error_description": "Bad request has been made, please check the parameters",
+		})
+		return
 	}
 	authCode, err := server.store.GetAuthCode(c.Request.Context(), req.Code)
 	if err != nil {
-		// Validar correctament l'error
+		c.JSON(400, gin.H{
+			"error":             "invalid_grant",
+			"error_description": "Invalid authorization code or expired",
+		})
+		return
 	}
 	if authCode.ClientID != req.ClientID {
-		// Validar correctament l'error
+		c.JSON(400, gin.H{
+			"error":             "invalid_grant",
+			"error_description": "The client ID does not match the one used in the authorization request",
+		})
+		return
 	}
 	if req.RedirectUri != "" && authCode.RedirectUri != req.RedirectUri {
-		// Validar correctamnet l'error
+		c.JSON(400, gin.H{
+			"error":             "invalid_grant",
+			"error_description": "The redirect URI does not match with the one used in the authorization request",
+		})
+		return
 	}
 	if authCode.Scope.String != "openid" {
-		//Validar correctament l'error
+		c.JSON(400, gin.H{
+			"error":             "invalid_scope",
+			"error_description": "The scope is not valid",
+		})
+		return
 	}
 
 	idtoken, payload, err := server.tokenMaker.CreateIDToken(req.ClientID, authCode.Sub, []string{req.ClientID}, server.Config.TokenDuration)
+	accessToken, _, err := server.tokenMaker.CreateToken(authCode.Sub, server.Config.TokenDuration)
 
 	response := &TokenPostHandlerResponse{
-		IdToken:    idtoken,
-		ExpiresIn:  payload.ExpiredAt,
-		TockenType: "Bearer",
+		IdToken:     idtoken,
+		ExpiresIn:   payload.ExpiredAt,
+		TockenType:  "Bearer",
+		AccessToken: accessToken,
 	}
+
+	c.JSON(200, response)
+	return
 
 }
