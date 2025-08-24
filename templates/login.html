@@ -34,7 +34,6 @@
       -moz-osx-font-smoothing:grayscale;
       padding:32px;
     }
-
     /* Centered card */
     .card{
       width:100%;
@@ -46,7 +45,6 @@
       border: 1px solid rgba(255,255,255,0.04);
       backdrop-filter: blur(8px) saturate(120%);
     }
-
     .brand{
       display:flex;
       gap:12px;
@@ -62,9 +60,7 @@
     }
     h1{margin:0;font-size:20px;font-weight:600}
     p.lead{margin:4px 0 0;color:var(--muted);font-size:13px}
-
     form{margin-top:18px;display:flex;flex-direction:column;gap:12px}
-
     .field{
       margin-top: 10px; 
       position:relative;
@@ -80,41 +76,27 @@
     }
     input:focus{border-color: rgba(124,92,255,0.7);box-shadow:0 6px 18px rgba(124,92,255,0.06);}
     input:not(:placeholder-shown)+label, input:focus+label{transform:translateY(-28px) scale(.95);opacity:0.95}
-
-    .icon-right{
-      position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;gap:6px;align-items:center;
-    }
+    .icon-right{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;gap:6px;align-items:center; }
     .btn{
       display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:12px;
       background: linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:white;font-weight:600;cursor:pointer;font-size:15px;
-      box-shadow: 0 8px 20px rgba(124,92,255,0.14);
-    }
-    .btn.secondary{
-      background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);font-weight:600;
-    }
-
-    .meta{
-      display:flex;align-items:center;justify-content:space-between;margin-top:6px;font-size:13px;color:var(--muted)
-    }
+      box-shadow: 0 8px 20px rgba(124,92,255,0.14);}
+    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);font-weight:600; }
+    .meta{ display:flex;align-items:center;justify-content:space-between;margin-top:6px;font-size:13px;color:var(--muted)}
     .forgot{color:var(--muted);text-decoration:none}
     .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.03),transparent);margin:12px 0;border-radius:4px}
-
     .social{display:flex;gap:10px}
     .social button{flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);color:var(--muted);cursor:pointer}
-
     .note{text-align:center;color:var(--muted);font-size:13px;margin-top:12px}
-
     /* small screen tweaks */
     @media (max-width:420px){
       .card{padding:20px;margin:0 8px}
       .logo{width:44px;height:44px}
     }
-
   </style>
 </head>
 <body>
   <main class="card" role="main" aria-labelledby="login-heading">
-    
     <div class="brand">
       <div class="logo" aria-hidden="true">DS</div>
       <div>
@@ -122,13 +104,11 @@
         <p class="lead">Inicia sessió amb el teu compte per continuar.</p>
       </div>
     </div>
-
     <form id="loginForm" novalidate>
       <div class="field">
         <input id="email" type="email" placeholder=" " required autocomplete="username">
         <label for="email">Correu electrònic</label>
       </div>
-
       <div class="field">
         <input id="password" type="password" placeholder=" " required autocomplete="current-password" minlength="6">
         <label for="password">Contrasenya</label>
@@ -142,17 +122,13 @@
           </button>
         </div>
       </div>
-
       <div style="margin-top:8px;display:flex;gap:10px">
         <button class="btn" type="submit">Inicia sessió</button>
         <button class="btn secondary" type="button" onclick="onRegister()">Registra't</button>
       </div>
-
       <div class="divider" role="separator" aria-hidden></div>
-
     </form>
   </main>
-
   <script>
     const showBtn = document.getElementById('showPwd');
     const pwd = document.getElementById('password');
@@ -161,13 +137,11 @@
       pwd.type = isPwd ? 'text' : 'password';
       showBtn.setAttribute('aria-pressed', String(isPwd));
     });
-
     // Simple client-side validation demo
     document.getElementById('loginForm').addEventListener('submit', (e)=>{
       e.preventDefault();
       const email = document.getElementById('email');
       const password = document.getElementById('password');
-
       const params = new URLSearchParams(window.location.search);
       const scope = params.get('scoope') || '';
       const responseType = params.get('response_type') || '';
@@ -175,7 +149,6 @@
       const state = params.get('state') || '';
       const clientId = params.get('client_id') || '';
       const prompt = params.get('prompt') || '';
-
       if(!email.checkValidity()){
         email.reportValidity();
         return;
@@ -184,7 +157,6 @@
         password.reportValidity();
         return;
       }
-
       const body = {
         email: email.value,
         password: password.value,
@@ -195,18 +167,13 @@
         client_id: clientId,
         prompt: prompt
       };
-      
       fetch('/login', {
         method: 'POST',
         headers: {
-          'Content-Type' : 'applicarion/json'
-        }
-      })
-    });
-
+          'Content-Type' : 'applicarion/json'}})});
     function onRegister(){
       alert('Pàgina de registre demo — aquí podríem redirigir a /register');
-    }
+    }   
   </script>
 </body>
 </html>
