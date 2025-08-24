@@ -61,3 +61,14 @@ func (server *Server) LoginPostHandler(c *gin.Context) {
 	c.Redirect(302, "/authorize?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
 	return
 }
+
+func (server *Server) BuildIssuerURL() string {
+	if server.Config.RunMode == "local" {
+		return "http://localhost:8080"
+	} else {
+		return "https://" + server.Config.Issuer
+	}
+}
+func (server *Server) BuildHandlerURL(handler string) string {
+	return server.BuildIssuerURL() + handler
+}

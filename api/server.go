@@ -56,6 +56,8 @@ func (server *Server) Router() {
 	router.POST("/token")
 	router.GET("/login", server.DisplayLoginPage)
 
+	router.GET("/well-known/openid-configuration", server.DiscoveryGetHandler)
+
 	server.router = router
 
 	//RunLocal(router)
