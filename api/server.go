@@ -57,6 +57,8 @@ func (server *Server) Router() {
 	router.GET("/login", server.DisplayLoginPage)
 
 	router.GET("/well-known/openid-configuration", server.DiscoveryGetHandler)
+	router.GET("/initiate_login_uri", server.InitiateLoginHandler)
+	router.GET("/.well-known/jwks.json", server.JwksGetHandler)
 
 	server.router = router
 

@@ -11,4 +11,6 @@ type Maker interface {
 	VerifyIDToken(token string) (*IDTokenPayload, error)
 	//CreateIDToken creates a new IDToken for the given request.
 	CreateIDToken(issuer string, subject string, audience []string, duration time.Duration) (string, *IDTokenPayload, error)
+	// Jwks returns the JSON Web Key Set (JWKS)
+	Jwks() map[string]interface{}
 }
