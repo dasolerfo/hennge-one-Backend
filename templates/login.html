@@ -26,9 +26,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      background: radial-gradient(600px 400px at 10% 20%, rgba(124,92,255,0.12), transparent),
-                  radial-gradient(500px 300px at 95% 80%, rgba(77,208,225,0.08), transparent),
-                  linear-gradient(180deg,var(--bg-1),var(--bg-2));
+      background: radial-gradient(600px 400px at 10% 20%, rgba(124,92,255,0.12), transparent), radial-gradient(500px 300px at 95% 80%, rgba(77,208,225,0.08), transparent), linear-gradient(180deg,var(--bg-1),var(--bg-2));
       color: #e6eef8;
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
@@ -43,37 +41,31 @@
       padding:28px;
       box-shadow: 0 8px 30px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.04);
-      backdrop-filter: blur(8px) saturate(120%);
-    }
+      backdrop-filter: blur(8px) saturate(120%);}
     .brand{
       display:flex;
       gap:12px;
       align-items:center;
-      margin-bottom:25px;
-    }
+      margin-bottom:25px;}
     .logo{
       width:48px;height:48px;border-radius:12px;
       background: linear-gradient(135deg,var(--accent),var(--accent-2));
       display:grid;place-items:center;font-weight:700;color:white;font-size:20px;
       box-shadow: 0 6px 20px rgba(124,92,255,0.12);
-      flex:0 0 48px;
-    }
+      flex:0 0 48px;}
     h1{margin:0;font-size:20px;font-weight:600}
     p.lead{margin:4px 0 0;color:var(--muted);font-size:13px}
     form{margin-top:18px;display:flex;flex-direction:column;gap:12px}
     .field{
       margin-top: 10px; 
-      position:relative;
-    }
+      position:relative;}
     label{
       position:absolute;left:14px;top:10px;color:rgba(255,255,255,0.7);
-      font-size:13px;pointer-events:none;transition:all .18s ease;
-    }
+      font-size:13px;pointer-events:none;transition:all .18s ease;}
     input[type="text"],input[type="password"],input[type="email"]{
       width:100%;padding:16px 44px 16px 14px;border-radius:var(--input-radius);
       background: rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.03);
-      color:inherit;font-size:15px;outline:none;transition:all .16s ease;
-    }
+      color:inherit;font-size:15px;outline:none;transition:all .16s ease;}
     input:focus{border-color: rgba(124,92,255,0.7);box-shadow:0 6px 18px rgba(124,92,255,0.06);}
     input:not(:placeholder-shown)+label, input:focus+label{transform:translateY(-28px) scale(.95);opacity:0.95}
     .icon-right{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;gap:6px;align-items:center; }
@@ -88,11 +80,9 @@
     .social{display:flex;gap:10px}
     .social button{flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);color:var(--muted);cursor:pointer}
     .note{text-align:center;color:var(--muted);font-size:13px;margin-top:12px}
-    /* small screen tweaks */
     @media (max-width:420px){
       .card{padding:20px;margin:0 8px}
-      .logo{width:44px;height:44px}
-    }
+      .logo{width:44px;height:44px}}
   </style>
 </head>
 <body>
@@ -151,29 +141,17 @@
       const prompt = params.get('prompt') || '';
       if(!email.checkValidity()){
         email.reportValidity();
-        return;
-      }
+        return; }
       if(!password.checkValidity()){
         password.reportValidity();
-        return;
-      }
+        return;}
       const body = {
-        email: email.value,
-        password: password.value,
-        scope: scope,
-        response_type: responseType,
-        redirect_uri: redirectUri,
-        state: state,
-        client_id: clientId,
-        prompt: prompt
+        email: email.value, password: password.value, scope: scope, response_type: responseType, redirect_uri: redirectUri, state: state, client_id: clientId, prompt: prompt
       };
       fetch('/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type' : 'applicarion/json'}})});
+        method: 'POST', headers: {'Content-Type' : 'applicarion/json'}})});
     function onRegister(){
-      alert('Pàgina de registre demo — aquí podríem redirigir a /register');
-    }   
+      alert('Pàgina de registre demo — aquí podríem redirigir a /register');}   
   </script>
 </body>
 </html>
