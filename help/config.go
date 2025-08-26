@@ -22,6 +22,7 @@ type Config struct {
 	TokenEndpoint    string `mapstructure:"TOKEN_ENDPOINT"`
 	JwksEndpoint     string `mapstructure:"JWKS_ENDPOINT"`
 	UserinfoEndpoint string `mapstructure:"USERINFO_ENDPOINT"`
+	SymmetricKeyBits int    `mapstructure:"SYMMETRIC_KEY_BITS"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

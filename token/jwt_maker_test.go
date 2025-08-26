@@ -12,7 +12,7 @@ import (
 
 func TestJWTMaker(t *testing.T) {
 	// Create a new JWT maker
-	maker, err := NewJWTMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewJWTMaker(int(help.RandomInt(1024, 2048))) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Test token creation and verification
@@ -44,7 +44,7 @@ func TestJWTMaker(t *testing.T) {
 
 func TestExpiredJWTToken(t *testing.T) {
 	// Create a new JWT maker
-	maker, err := NewJWTMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewJWTMaker(int(help.RandomInt(1024, 2048))) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Test token creation with a short duration
@@ -65,7 +65,7 @@ func TestExpiredJWTToken(t *testing.T) {
 
 func TestInvalidJWTToken(t *testing.T) {
 	// Create a new JWT maker
-	maker, err := NewJWTMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewJWTMaker(int(help.RandomInt(1024, 2048))) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Test with an invalid token
@@ -79,7 +79,7 @@ func TestInvalidJWTToken(t *testing.T) {
 
 func TestInvalidJWTAlgNoneToken(t *testing.T) {
 	// Create a new JWT maker
-	maker, err := NewJWTMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewJWTMaker(int(help.RandomInt(1024, 2048))) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Create a token with "none" algorithm
@@ -99,7 +99,7 @@ func TestInvalidJWTAlgNoneToken(t *testing.T) {
 
 func TestJWTIDToken(t *testing.T) {
 	// Create a new JWT maker
-	maker, err := NewJWTMaker(help.RandomString(32)) // Ensure the key is at least 32 characters
+	maker, err := NewJWTMaker(int(help.RandomInt(1024, 2048))) // Ensure the key is at least 32 characters
 	require.NoError(t, err)
 
 	// Test token creation and verification

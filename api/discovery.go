@@ -32,6 +32,7 @@ type DiscoveryResponse struct {
 	IDTokenAlgs       []string `json:"id_token_signing_alg_values_supported"`
 	Scopes            []string `json:"scopes_supported"`
 	CodeChallengeAlgs []string `json:"code_challenge_methods_supported"`
+	Claims            []string `json:"claims_supported"`
 }
 
 func (server *Server) DiscoveryGetHandler(c *gin.Context) {
@@ -50,6 +51,7 @@ func (server *Server) DiscoveryGetHandler(c *gin.Context) {
 			"plain",
 			"S256",
 		},
+		Claims: []string{"sub", "name", "email", "email_verified", "gender"},
 	}
 	c.JSON(200, response)
 	return

@@ -8,22 +8,22 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type JWTMaker struct {
+type JWTMakerHS256 struct {
 	secretKey string
 }
 
 const minKeySize = 32 // Minimum key size for HMAC-SHA256
 
 // NewJWTMaker creates a new JWTMaker with the provided secret key.
-func NewJWTMaker(secretKey string) (Maker, error) {
+func NewJWTMakerHS256(secretKey string) (*JWTMakerHS256, error) {
 	if len(secretKey) < minKeySize {
 		return nil, fmt.Errorf("invalid key size: must be at least %d characters", minKeySize)
 	}
-	return &JWTMaker{secretKey: secretKey}, nil
+	return &JWTMakerHS256{secretKey: secretKey}, nil
 }
 
 // CreateToken creates a new JWT token for the given email and duration.
-func (maker *JWTMaker) CreateToken(email string, duration time.Duration) (string, *Payload, error) {
+func (maker *JWTMakerHS256) CreateTokenHS256(email string, duration time.Duration) (string, *Payload, error) {
 	payload, err := NewPayload(email, duration)
 	if err != nil {
 		return "", payload, err
@@ -35,7 +35,7 @@ func (maker *JWTMaker) CreateToken(email string, duration time.Duration) (string
 }
 
 // CreateToken creates a new JWT token for the given email and duration.
-func (maker *JWTMaker) CreateIDToken(issuer string, subject string, audience []string, duration time.Duration) (string, *IDTokenPayload, error) {
+func (maker *JWTMakerHS256) CreateIDTokenHS256(issuer string, subject string, audience []string, duration time.Duration) (string, *IDTokenPayload, error) {
 
 	payload, err := NewIDTokenPayLoad(issuer, subject, audience, duration)
 	if err != nil {
@@ -48,7 +48,7 @@ func (maker *JWTMaker) CreateIDToken(issuer string, subject string, audience []s
 }
 
 // VerifyToken checks if the JWT token is valid and returns the payload if it is.
-func (maker *JWTMaker) VerifyToken(token string) (*Payload, error) {
+func (maker *JWTMakerHS256) VerifyTokenHS256(token string) (*Payload, error) {
 	funcioKey := func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
@@ -76,7 +76,7 @@ func (maker *JWTMaker) VerifyToken(token string) (*Payload, error) {
 }
 
 // VerifyToken checks if the JWT token is valid and returns the payload if it is.
-func (maker *JWTMaker) VerifyIDToken(token string) (*IDTokenPayload, error) {
+func (maker *JWTMakerHS256) VerifyIDTokenHS256(token string) (*IDTokenPayload, error) {
 	funcioKey := func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
@@ -102,7 +102,7 @@ func (maker *JWTMaker) VerifyIDToken(token string) (*IDTokenPayload, error) {
 
 }
 
-func (maker *JWTMaker) VerifyAccessToken(token string) (*AccessTokenPayload, error) {
+func (maker *JWTMakerHS256) VerifyAccessTokenHS256(token string) (*AccessTokenPayload, error) {
 	funcioKey := func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
@@ -129,7 +129,7 @@ func (maker *JWTMaker) VerifyAccessToken(token string) (*AccessTokenPayload, err
 }
 
 // Jwks returns the JSON Web Key Set (JWKS)
-func (maker *JWTMaker) Jwks() map[string]interface{} {
+func (maker *JWTMakerHS256) Jwks() map[string]interface{} {
 	jwks := make(map[string]interface{})
 	jwks["keys"] = []map[string]string{
 		{
