@@ -101,3 +101,43 @@ func (maker *JWTMaker) VerifyIDToken(token string) (*IDTokenPayload, error) {
 	return payload, nil
 
 }
+
+func (maker *JWTMaker) VerifyAccessToken(token string) (*AccessTokenPayload, error) {
+	funcioKey := func(token *jwt.Token) (interface{}, error) {
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return nil, InvalidTokenError
+		}
+		return []byte(maker.secretKey), nil
+	}
+
+	jwtToken, err := jwt.ParseWithClaims(token, &AccessTokenPayload{}, funcioKey)
+
+	if err != nil {
+		// Check if the error is due to an expired token
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return nil, ExpiredTokenError
+		}
+		return nil, InvalidTokenError
+	}
+	payload, ok := jwtToken.Claims.(*AccessTokenPayload)
+	if !ok {
+		return nil, InvalidTokenError
+	}
+	return payload, nil
+
+}
+
+// Jwks returns the JSON Web Key Set (JWKS)
+func (maker *JWTMaker) Jwks() map[string]interface{} {
+	jwks := make(map[string]interface{})
+	jwks["keys"] = []map[string]string{
+		{
+			"kty": "oct",
+			"use": "sig",
+			"alg": "HS256",
+			"k":   maker.secretKey,
+		},
+	}
+	return jwks
+}

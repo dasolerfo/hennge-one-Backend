@@ -152,6 +152,4 @@ func (server *Server) InitiateLoginHandler(c *gin.Context) {
 
 	redirectUri := "/login?scope=openid&response_type=code&redirect_uri=" + req.TargetLinkUri + "&state=initiate_login&client_id=hennge-one-client&prompt=login"
 	c.Redirect(302, redirectUri)*/
-	return
-
 }

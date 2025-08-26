@@ -13,7 +13,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (name, hashed_password, email)
 VALUES ($1, $2, $3)
-RETURNING id, name, hashed_password, email, created_at
+RETURNING id, name, hashed_password, email, email_verified, gender, created_at
 `
 
 type CreateUserParams struct {
@@ -30,13 +30,15 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Name,
 		&i.HashedPassword,
 		&i.Email,
+		&i.EmailVerified,
+		&i.Gender,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, name, hashed_password, email, created_at FROM users
+SELECT id, name, hashed_password, email, email_verified, gender, created_at FROM users
 WHERE email = $1
 `
 
@@ -48,6 +50,28 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Name,
 		&i.HashedPassword,
 		&i.Email,
+		&i.EmailVerified,
+		&i.Gender,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getUserByID = `-- name: GetUserByID :one
+SELECT id, name, hashed_password, email, email_verified, gender, created_at FROM users
+WHERE id = $1
+`
+
+func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.HashedPassword,
+		&i.Email,
+		&i.EmailVerified,
+		&i.Gender,
 		&i.CreatedAt,
 	)
 	return i, err

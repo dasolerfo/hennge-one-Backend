@@ -3,6 +3,8 @@ CREATE TABLE "users" (
   "name" VARCHAR,
   "hashed_password" VARCHAR NOT NULL DEFAULT '12345678',
   "email" VARCHAR UNIQUE NOT NULL,
+  "email_verified" BOOLEAN NOT NULL DEFAULT FALSE,
+  "gender" VARCHAR,
   "created_at" "TIMESTAMPTZ" NOT NULL DEFAULT (NOW())
 );
 

@@ -25,5 +25,7 @@ type User struct {
 	Name           sql.NullString `json:"name"`
 	HashedPassword string         `json:"hashed_password"`
 	Email          string         `json:"email"`
+	EmailVerified  bool           `json:"email_verified"`
+	Gender         sql.NullString `json:"gender"`
 	CreatedAt      interface{}    `json:"created_at"`
 }
