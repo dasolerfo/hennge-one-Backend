@@ -64,7 +64,6 @@ func (server *Server) Router() {
 
 	server.router = router
 
-	//RunLocal(router)
 }
 
 func (server *Server) Start() {
