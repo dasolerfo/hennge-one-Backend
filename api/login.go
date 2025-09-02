@@ -1,8 +1,10 @@
 package api
 
 import (
+	"database/sql"
 	"strconv"
 
+	db "github.com/dasolerfo/hennge-one-Backend.git/db/model"
 	"github.com/dasolerfo/hennge-one-Backend.git/help"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -69,6 +71,59 @@ func (server *Server) BuildIssuerURL() string {
 		return "https://" + server.Config.Issuer
 	}
 }
+
 func (server *Server) BuildHandlerURL(handler string) string {
 	return server.BuildIssuerURL() + handler
+}
+
+type CreateUserRequest struct {
+	Name          string `json:"name" binding:"required"`
+	Email         string `json:"email" binding:"required,email"`
+	Password      string `json:"password" binding:"required,min=6"`
+	Gender        string `json:"gender" binding:"omitempty"`
+	EmailVerified bool   `json:"email_verified"`
+}
+
+func (server *Server) CreateUserHandler(c *gin.Context) {
+	var req CreateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{
+			"error":             "invalid_request",
+			"error_description": "Bad request has been made, please check the parameters",
+		})
+		return
+	}
+
+	hashedPassword, err := help.HashPassword(req.Password)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error":             "server_error",
+			"error_description": "Failed to hash the password",
+		})
+		return
+	}
+
+	user, err := server.store.CreateUser(c.Request.Context(), db.CreateUserParams{
+		Name:           req.Name,
+		Email:          req.Email,
+		HashedPassword: hashedPassword,
+		Gender:         sql.NullString{String: req.Gender, Valid: req.Gender != ""},
+		EmailVerified:  req.EmailVerified,
+	})
+
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error":             "server_error",
+			"error_description": "Failed to create the user",
+		})
+		return
+	}
+
+	c.JSON(201, gin.H{
+		"message": "User created successfully",
+		"name":    user.Name,
+		"email":   user.Email,
+		"id":      user.ID})
+	return
+
 }

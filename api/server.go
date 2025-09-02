@@ -50,6 +50,8 @@ func (server *Server) Router() {
 		r.JSON(200, gin.H{"hello": "Si reps això desde el Postmant, funciona!"})
 	})
 
+	router.POST("/create_user", server.CreateUserHandler)
+
 	router.GET("/authorize")
 	router.POST("/authorize")
 	router.GET("/token")

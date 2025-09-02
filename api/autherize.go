@@ -20,6 +20,7 @@ type AuthorizeGetHandlerRequest struct {
 	ClintId      string `uri:"client_id" binding:"required"`
 	Prompt       string `uri:"prompt"`
 	Display      string `uri:"display"`
+	Nonce        string `uri:"nonce"`
 }
 
 func (server *Server) AuthorizeGetHandler(c *gin.Context) {
@@ -61,6 +62,7 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 			Scope:         sql.NullString{String: req.Scope, Valid: true},
 			ExpiresAt:     time.Now().Add(server.Config.CodeExpirationTime),
 			CodeChallenge: sql.NullString{String: "RS256", Valid: true},
+			Nonce:         sql.NullString{String: req.Nonce, Valid: true},
 		})
 
 		if err != nil {

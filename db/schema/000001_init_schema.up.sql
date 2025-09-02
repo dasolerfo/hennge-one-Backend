@@ -1,6 +1,6 @@
 CREATE TABLE "users" (
   "id" BIGINT PRIMARY KEY,
-  "name" VARCHAR,
+  "name" VARCHAR NOT NULL,
   "hashed_password" VARCHAR NOT NULL DEFAULT '12345678',
   "email" VARCHAR UNIQUE NOT NULL,
   "email_verified" BOOLEAN NOT NULL DEFAULT FALSE,
@@ -15,6 +15,7 @@ CREATE TABLE auth_codes (
     "sub" TEXT NOT NULL,
     "scope" TEXT,
     "code_challenge" TEXT,
+    "nonce" TEXT,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "expires_at" TIMESTAMPTZ NOT NULL
 );
