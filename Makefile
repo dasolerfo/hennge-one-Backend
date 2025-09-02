@@ -9,9 +9,9 @@ createdb:
 dropdb:
 	docker exec -it henngeone-db dropdb sso
 migrateup:
-	migrate -path db/migration -database "$(DB_URL)" -verbose up
+	migrate -path db/schema -database "$(DB_URL)" -verbose up
 migratedown:
-	migrate -path db/migration -database "$(DB_URL)" -verbose down
+	migrate -path db/schema -database "$(DB_URL)" -verbose down
 sqlc:
 	sqlc generate
 upgradesqlc:
