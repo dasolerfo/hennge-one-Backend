@@ -1,13 +1,13 @@
-DB_URL=postgresql://root:Songoku13@localhost:5432/simple_bank?sslmode=disable
+DB_URL=postgresql://root:Badalona123@localhost:5432/sso?sslmode=disable
 
 postgres: 
-	docker run --name postgres12 --network bank-network -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=Songoku13 -d postgres:12-alpine
+	docker run --name henngeone-db --network bank-network -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=Badalona123 -d postgres:12-alpine
 startDB:
-	docker start postgres12
+	docker start henngeone-db
 createdb:
-	docker exec -it postgres12 createdb --username=root --owner=root simple_bank
+	docker exec -it henngeone-db createdb --username=root --owner=root sso
 dropdb:
-	docker exec -it postgres12 dropdb simple_bank
+	docker exec -it henngeone-db dropdb sso
 migrateup:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up
 migratedown:

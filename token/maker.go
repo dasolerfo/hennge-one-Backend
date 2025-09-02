@@ -12,7 +12,7 @@ type Maker interface {
 	// VerifyAccessToken checks if the AccessToken is valid and returns the email if it is.
 	VerifyAccessToken(token string) (*AccessTokenPayload, error)
 	//CreateIDToken creates a new IDToken for the given request.
-	CreateIDToken(issuer string, subject string, audience []string, duration time.Duration) (string, *IDTokenPayload, error)
+	CreateIDToken(issuer string, subject string, audience []string, auth_time int64, duration time.Duration) (string, *IDTokenPayload, error)
 	// Jwks returns the JSON Web Key Set (JWKS)
 	Jwks() map[string]interface{}
 }

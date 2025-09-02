@@ -28,6 +28,7 @@ type AccessTokenPayload struct {
 
 type IDTokenPayload struct {
 	Payload
+	AuthTime int64    `json:"auth_time"`
 	Audience []string `json:"aud"`
 }
 
@@ -89,7 +90,7 @@ func NewPayload(email string, duration time.Duration) (*Payload, error) {
 	return payload, nil
 }
 
-func NewIDTokenPayLoad(issuer string, subject string, audience []string, duration time.Duration) (*IDTokenPayload, error) {
+func NewIDTokenPayLoad(issuer string, subject string, audience []string, auth_time int64, duration time.Duration) (*IDTokenPayload, error) {
 
 	payload := &IDTokenPayload{
 		Payload: Payload{
@@ -98,7 +99,7 @@ func NewIDTokenPayLoad(issuer string, subject string, audience []string, duratio
 			IssuedAt:  int64(time.Now().UTC().Unix()),
 			ExpiredAt: int64(time.Now().UTC().Add(duration).Unix()),
 		},
-
+		AuthTime: int64(time.Now().UTC().Unix()),
 		Audience: audience,
 	}
 	return payload, nil

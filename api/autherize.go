@@ -19,6 +19,7 @@ type AuthorizeGetHandlerRequest struct {
 	State        string `uri:"state" `
 	ClintId      string `uri:"client_id" binding:"required"`
 	Prompt       string `uri:"prompt"`
+	Display      string `uri:"display"`
 }
 
 func (server *Server) AuthorizeGetHandler(c *gin.Context) {
@@ -59,7 +60,7 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 			Sub:           userID.(string),
 			Scope:         sql.NullString{String: req.Scope, Valid: true},
 			ExpiresAt:     time.Now().Add(server.Config.CodeExpirationTime),
-			CodeChallenge: sql.NullString{String: "login", Valid: true},
+			CodeChallenge: sql.NullString{String: "RS256", Valid: true},
 		})
 
 		if err != nil {
@@ -76,6 +77,12 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 
 	if req.Prompt == "none" {
 		redirectUri := req.RedirectUri + "?error=login_required&state=" + req.State
+		c.Redirect(http.StatusFound, redirectUri)
+		return
+	}
+
+	if req.Display == "none" {
+		redirectUri := req.RedirectUri + "?error=interaction_required&state=" + req.State
 		c.Redirect(http.StatusFound, redirectUri)
 		return
 	}

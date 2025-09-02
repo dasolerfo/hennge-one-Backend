@@ -50,9 +50,9 @@ func (maker *JWTMaker) CreateToken(email string, duration time.Duration) (string
 }
 
 // CreateToken creates a new JWT token for the given email and duration.
-func (maker *JWTMaker) CreateIDToken(issuer string, subject string, audience []string, duration time.Duration) (string, *IDTokenPayload, error) {
+func (maker *JWTMaker) CreateIDToken(issuer string, subject string, audience []string, auth_time int64, duration time.Duration) (string, *IDTokenPayload, error) {
 
-	payload, err := NewIDTokenPayLoad(issuer, subject, audience, duration)
+	payload, err := NewIDTokenPayLoad(issuer, subject, audience, auth_time, duration)
 	if err != nil {
 		return "", payload, err
 	}

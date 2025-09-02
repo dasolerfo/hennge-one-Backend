@@ -61,7 +61,7 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 		return
 	}
 
-	idtoken, payload, err := server.tokenMaker.CreateIDToken(req.ClientID, authCode.Sub, []string{req.ClientID}, server.Config.TokenDuration)
+	idtoken, payload, err := server.tokenMaker.CreateIDToken(server.Config.Issuer, authCode.Sub, []string{req.ClientID}, authCode.CreatedAt.Unix(), server.Config.TokenDuration)
 	accessToken, _, err := server.tokenMaker.CreateToken(authCode.Sub, server.Config.TokenDuration)
 
 	response := &TokenPostHandlerResponse{
