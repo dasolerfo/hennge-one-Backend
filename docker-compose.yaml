@@ -3,9 +3,9 @@ services:
   postgres:
    image: postgres:12-alpine
    environment:
-     - POSTGRES_USER=root
-     - POSTGRES_PASSWORD=Badalona123
-     - POSTGRES_DB=henngeone-db
+     - POSTGRES_USER=${POSTGRES_USER}
+     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+     - POSTGRES_DB=${POSTGRES_DB}
   api: 
     build: 
       context: .
@@ -13,7 +13,7 @@ services:
     ports:
       - "8080:8080"  
     environment: 
-      - DB_SOURCE=postgresql://root:Badalona123@localhost:5432/sso?sslmode=disable
+      - DB_SOURCE=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable
     depends_on:
       - postgres
     entrypoint: ["/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh"]
