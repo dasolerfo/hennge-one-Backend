@@ -44,11 +44,12 @@ jobs:
           docker push -a $REGISTRY/$REPOSITORY
           
     - name: Deploy to EC2
-      uses: appleboy/ssh-action@v0.1.5
+      uses: appleboy/ssh-action@v1
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
+        port: 22
         script: |
           cd ~/myapp
           bash ./updatecontainer.sh
