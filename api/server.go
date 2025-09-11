@@ -72,7 +72,8 @@ func (server *Server) Start() {
 	if server.Config.RunMode == "local" {
 		RunLocal(server.router)
 	} else {
-		RunRemote(server.router)
+		//RunRemote(server.router)
+		RunEC2(server.router)
 	}
 }
 
@@ -109,5 +110,16 @@ func RunRemote(router *gin.Engine) {
 	}()
 
 	log.Fatal(srv.ListenAndServeTLS("", ""))
+
+}
+
+func RunEC2(router *gin.Engine) {
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
+
+	log.Println("Servidor HTTP escoltant a http://0.0.0.0:8080")
+	log.Fatal(srv.ListenAndServe())
 
 }
