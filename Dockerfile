@@ -15,6 +15,7 @@ COPY --from=builder /app/migrate ./migrate
 COPY start.sh .
 COPY wait-for.sh .
 COPY app.env .
+COPY --from=builder /app/templates ./templates
 COPY db/schema ./schema
 
 
