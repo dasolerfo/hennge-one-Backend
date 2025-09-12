@@ -21,3 +21,5 @@ sqlc:
 	sqlc generate
 upgradesqlc:
 	brew upgrade sqlc
+mockgen:
+	mockgen -package mockdb -destination db/mock/store.go ./db/model Store	

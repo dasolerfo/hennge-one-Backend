@@ -12,6 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const authType = "Bearer"
+
 type AuthorizeGetHandlerRequest struct {
 	Scope        string `uri:"scope" binding:"required"`
 	ResponseType string `uri:"response_type" binding:"required"`

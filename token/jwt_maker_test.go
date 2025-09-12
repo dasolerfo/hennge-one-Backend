@@ -27,7 +27,7 @@ func TestJWTMaker(t *testing.T) {
 	require.NotEmpty(t, token)
 	require.NotEmpty(t, payload)
 
-	payload, err = maker.VerifyToken(token)
+	payload, err = maker.VerifyAccessToken(token)
 	require.NoError(t, err)
 	require.NotEmpty(t, payload)
 	//require.NotZero(t, payload.Issuer)
@@ -57,7 +57,7 @@ func TestExpiredJWTToken(t *testing.T) {
 	require.NotEmpty(t, payload)
 
 	// Verify the expired token
-	payload, err = maker.VerifyToken(token)
+	payload, err = maker.VerifyAccessToken(token)
 	require.Error(t, err)
 	require.Nil(t, payload)
 	require.EqualError(t, err, ExpiredTokenError.Error())
@@ -91,7 +91,7 @@ func TestInvalidJWTAlgNoneToken(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verify the token
-	payload, err = maker.VerifyToken(signedToken)
+	payload, err = maker.VerifyAccessToken(signedToken)
 	require.Error(t, err)
 	require.EqualError(t, err, InvalidTokenError.Error())
 	require.Nil(t, payload)
