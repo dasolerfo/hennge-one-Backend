@@ -42,6 +42,7 @@ func NewServer(config *help.Config, store *db.Store) (*Server, error) {
 
 func (server *Server) Router() {
 	router := gin.Default()
+	router.LoadHTMLGlob("../templates/*")
 
 	store := cookie.NewStore([]byte(server.Config.SessionKey))
 	router.Use(sessions.Sessions("session_active", store))
@@ -52,10 +53,9 @@ func (server *Server) Router() {
 
 	router.POST("/create_user", server.CreateUserHandler)
 
-	router.GET("/authorize")
-	router.POST("/authorize")
-	router.GET("/token")
-	router.POST("/token")
+	router.GET("/authorize", server.AuthorizeGetHandler)
+	//router.POST("/authorize")
+	router.POST("/token", server.TokenPostHandler)
 	router.GET("/login", server.DisplayLoginPage)
 
 	router.GET("/well-known/openid-configuration", server.DiscoveryGetHandler)

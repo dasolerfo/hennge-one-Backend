@@ -75,6 +75,110 @@ func TestUserInfo(t *testing.T) {
 				requireBodyMatchUser(t, recorder.Body, user)
 			},
 		},
+		{
+			name: "Unathorized - No Token",
+			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
+				token, payload, err := server.tokenMaker.CreateToken(user.Email, time.Minute)
+				require.NoError(t, err)
+				require.NotEmpty(t, token)
+				require.NotEmpty(t, payload)
+
+				//fmt.Println(payload.Subject)
+
+				//authorizationHeader := fmt.Sprintf("%s %s", authType, token)
+				//request.Header.Set("Authorization", authorizationHeader)
+
+			},
+			buildStbus: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
+					Times(0).
+					Return(user, nil)
+
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+				//requireBodyMatchUser(t, recorder.Body, user)
+			},
+		},
+		{
+			name: "Invalid Token",
+			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
+				token, payload, err := server.tokenMaker.CreateToken(user.Email, time.Minute)
+				require.NoError(t, err)
+				require.NotEmpty(t, token)
+				require.NotEmpty(t, payload)
+
+				//fmt.Println(payload.Subject)
+
+				authorizationHeader := fmt.Sprintf("%s %s", authType, token)
+				request.Header.Set("Authorization", authorizationHeader+"invalid")
+
+			},
+			buildStbus: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
+					Times(0).
+					Return(user, nil)
+
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+				//requireBodyMatchUser(t, recorder.Body, user)
+			},
+		},
+		{
+			name: "Unathorized - Unknown User",
+			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
+				token, payload, err := server.tokenMaker.CreateToken("noexisteixo@gmail.com", time.Minute)
+				require.NoError(t, err)
+				require.NotEmpty(t, token)
+				require.NotEmpty(t, payload)
+
+				//fmt.Println(payload.Subject)
+
+				authorizationHeader := fmt.Sprintf("%s %s", authType, token)
+				request.Header.Set("Authorization", authorizationHeader)
+
+			},
+			buildStbus: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Eq("noexisteixo@gmail.com")).
+					Times(1).
+					Return(db.User{}, sql.ErrNoRows)
+
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+				//requireBodyMatchUser(t, recorder.Body, user)
+			},
+		},
+		{
+			name: "Unathorized - Caducated Token",
+			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
+				token, payload, err := server.tokenMaker.CreateToken(user.Email, -time.Minute)
+				require.NoError(t, err)
+				require.NotEmpty(t, token)
+				require.NotEmpty(t, payload)
+
+				//fmt.Println(payload.Subject)
+
+				authorizationHeader := fmt.Sprintf("%s %s", authType, token)
+				request.Header.Set("Authorization", authorizationHeader)
+
+			},
+			buildStbus: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
+					Times(0).
+					Return(db.User{}, sql.ErrNoRows)
+
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+				//requireBodyMatchUser(t, recorder.Body, user)
+			},
+		},
 	}
 	for i := range testCases {
 		tc := testCases[i]
