@@ -42,7 +42,7 @@ func NewServer(config *help.Config, store *db.Store) (*Server, error) {
 
 func (server *Server) Router() {
 	router := gin.Default()
-	router.LoadHTMLGlob("../templates/*")
+	router.LoadHTMLGlob("./templates/*")
 
 	store := cookie.NewStore([]byte(server.Config.SessionKey))
 	router.Use(sessions.Sessions("session_active", store))
