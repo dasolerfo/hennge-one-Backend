@@ -40,7 +40,7 @@ type LoginPostHandlerRequest struct {
 
 func (server *Server) LoginPostHandler(c *gin.Context) {
 	var req LoginPostHandlerRequest
-	if err := c.ShouldBindQuery(&req); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.HTML(401, "login.html", gin.H{"error": "Invalid request parameters"})
 	}
 	user, err := server.store.GetUserByEmail(c.Request.Context(), req.Email)
