@@ -15,12 +15,12 @@ const (
 )
 
 type DisplayLoginPageRequest struct {
-	Scope        string `uri:"scope" binding:"required"`
-	ResponseType string `uri:"response_type" binding:"required"`
-	RedirectUri  string `uri:"redirect_uri" binding:"required"`
-	State        string `uri:"state"`
-	ClintId      string `uri:"client_id" binding:"required"`
-	Prompt       string `uri:"prompt"`
+	Scope        string `form:"scope" binding:"required"`
+	ResponseType string `form:"response_type" binding:"required"`
+	RedirectUri  string `form:"redirect_uri" binding:"required"`
+	State        string `form:"state"`
+	ClintId      string `form:"client_id" binding:"required"`
+	Prompt       string `form:"prompt"`
 }
 
 func (server *Server) DisplayLoginPage(c *gin.Context) {

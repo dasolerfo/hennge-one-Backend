@@ -15,14 +15,14 @@ import (
 const authType = "Bearer"
 
 type AuthorizeGetHandlerRequest struct {
-	Scope        string `uri:"scope" binding:"required"`
-	ResponseType string `uri:"response_type" binding:"required"`
-	RedirectUri  string `uri:"redirect_uri" binding:"required"`
-	State        string `uri:"state" `
-	ClintId      string `uri:"client_id" binding:"required"`
-	Prompt       string `uri:"prompt"`
-	Display      string `uri:"display"`
-	Nonce        string `uri:"nonce"`
+	Scope        string `form:"scope" binding:"required"`
+	ResponseType string `form:"response_type" binding:"required"`
+	RedirectUri  string `form:"redirect_uri" binding:"required"`
+	State        string `form:"state" `
+	ClintId      string `form:"client_id" binding:"required"`
+	Prompt       string `form:"prompt"`
+	Display      string `form:"display"`
+	Nonce        string `form:"nonce"`
 }
 
 func (server *Server) AuthorizeGetHandler(c *gin.Context) {
@@ -96,9 +96,9 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 }
 
 type InitiateLoginHandlerRequest struct {
-	Issuer        string `uri:"iss" bining:"required,http_url"`
-	LoginHint     string `uri:"login_hint"`
-	TargetLinkUri string `uri:"target_link_uri" binding:"http_url"`
+	Issuer        string `form:"iss" bining:"required,http_url"`
+	LoginHint     string `form:"login_hint"`
+	TargetLinkUri string `form:"target_link_uri" binding:"http_url"`
 }
 
 func (server *Server) InitiateLoginHandler(c *gin.Context) {
