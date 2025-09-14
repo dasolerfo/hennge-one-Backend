@@ -148,10 +148,8 @@
       const body = {
         email: email.value, password: password.value, scope: scope, response_type: responseType, redirect_uri: redirectUri, state: state, client_id: clientId, prompt: prompt
       };
-      fetch('/login', {
-        method: 'POST', headers: {'Content-Type' : 'applicarion/json'}})});
-    function onRegister(){
-      alert('Pàgina de registre demo — aquí podríem redirigir a /register');}   
+      fetch('/login', {method: 'POST', headers: {'Content-Type' : 'application/json'}, body: JSON.stringify(body)})});
+    function onRegister(){ alert('Pàgina de registre demo — aquí podríem redirigir a /register');}   
   </script>
 </body>
 </html>
