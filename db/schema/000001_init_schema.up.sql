@@ -7,7 +7,6 @@ CREATE TABLE "users" (
   "gender" VARCHAR,
   "created_at" TIMESTAMPTZ NOT NULL DEFAULT (NOW())
 );
-
 CREATE TABLE auth_codes (
     "code" TEXT PRIMARY KEY,
     "client_id" TEXT NOT NULL,
@@ -19,7 +18,6 @@ CREATE TABLE auth_codes (
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "expires_at" TIMESTAMPTZ NOT NULL
 );
-
 CREATE TABLE clients (
     "id" TEXT NOT NULL PRIMARY KEY,
     "client_name" TEXT NOT NULL,
