@@ -57,6 +57,7 @@ func (server *Server) Router() {
 	//router.POST("/authorize")
 	router.POST("/token", server.TokenPostHandler)
 	router.GET("/login", server.DisplayLoginPage)
+	router.POST("/login", server.LoginPostHandler)
 
 	router.GET("/well-known/openid-configuration", server.DiscoveryGetHandler)
 	router.GET("/initiate_login_uri", server.InitiateLoginHandler)
