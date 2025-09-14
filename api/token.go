@@ -9,10 +9,11 @@ func TokenGetHandler(c *gin.Context) {
 }
 
 type TokenPostHandlerRequest struct {
-	GrantType   string `form:"grant_type" binding:"required"`
-	ClientID    string `form:"client_id" binding:"required"`
-	RedirectUri string `form:"redirect_uri" binding:"required"`
-	Code        string `form:"code" binding:"required"`
+	GrantType    string `form:"grant_type" binding:"required"`
+	ClientID     string `form:"client_id" binding:"required"`
+	ClientSecret string `form:"client_secret" binding:"required"`
+	RedirectUri  string `form:"redirect_uri" binding:"required"`
+	Code         string `form:"code" binding:"required"`
 }
 type TokenPostHandlerResponse struct {
 	AccessToken  string `json:"access_token"`
@@ -43,6 +44,20 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 		c.JSON(400, gin.H{
 			"error":             "invalid_grant",
 			"error_description": "The client ID does not match the one used in the authorization request",
+		})
+		return
+	}
+	client, err := server.store.GetClientByID(c.Request.Context(), req.ClientID)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error":             "invalid_client",
+			"error_description": "The client ID is invalid",
+		})
+		return
+	} else if client.ClientSecret != req.ClientSecret {
+		c.JSON(400, gin.H{
+			"error":             "invalid_client",
+			"error_description": "The client secret is invalid",
 		})
 		return
 	}

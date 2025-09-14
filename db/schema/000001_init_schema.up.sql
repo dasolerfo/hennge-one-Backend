@@ -19,3 +19,11 @@ CREATE TABLE auth_codes (
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "expires_at" TIMESTAMPTZ NOT NULL
 );
+
+CREATE TABLE clients (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "client_name" TEXT NOT NULL,
+    "client_secret" TEXT NOT NULL,
+    "redirect_uris" TEXT[] NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT now()
+);

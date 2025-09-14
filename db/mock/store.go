@@ -56,6 +56,21 @@ func (mr *MockStoreMockRecorder) CreateAuthCode(ctx, arg any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAuthCode", reflect.TypeOf((*MockStore)(nil).CreateAuthCode), ctx, arg)
 }
 
+// CreateClient mocks base method.
+func (m *MockStore) CreateClient(ctx context.Context, arg db.CreateClientParams) (db.Client, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateClient", ctx, arg)
+	ret0, _ := ret[0].(db.Client)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateClient indicates an expected call of CreateClient.
+func (mr *MockStoreMockRecorder) CreateClient(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClient", reflect.TypeOf((*MockStore)(nil).CreateClient), ctx, arg)
+}
+
 // CreateUser mocks base method.
 func (m *MockStore) CreateUser(ctx context.Context, arg db.CreateUserParams) (db.User, error) {
 	m.ctrl.T.Helper()
@@ -84,6 +99,21 @@ func (m *MockStore) GetAuthCode(ctx context.Context, code string) (db.AuthCode, 
 func (mr *MockStoreMockRecorder) GetAuthCode(ctx, code any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAuthCode", reflect.TypeOf((*MockStore)(nil).GetAuthCode), ctx, code)
+}
+
+// GetClientByID mocks base method.
+func (m *MockStore) GetClientByID(ctx context.Context, id string) (db.Client, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetClientByID", ctx, id)
+	ret0, _ := ret[0].(db.Client)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetClientByID indicates an expected call of GetClientByID.
+func (mr *MockStoreMockRecorder) GetClientByID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClientByID", reflect.TypeOf((*MockStore)(nil).GetClientByID), ctx, id)
 }
 
 // GetUserByEmail mocks base method.

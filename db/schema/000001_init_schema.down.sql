@@ -1,2 +1,3 @@
 DROP TABLE IF EXISTS "users";
+DROP TABLE IF EXISTS "clients";
 DROP TABLE IF EXISTS "auth_codes";

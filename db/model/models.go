@@ -21,6 +21,14 @@ type AuthCode struct {
 	ExpiresAt     time.Time      `json:"expires_at"`
 }
 
+type Client struct {
+	ID           string    `json:"id"`
+	ClientName   string    `json:"client_name"`
+	ClientSecret string    `json:"client_secret"`
+	RedirectUris []string  `json:"redirect_uris"`
+	CreatedAt    time.Time `json:"created_at"`
+}
+
 type User struct {
 	ID             int64          `json:"id"`
 	Name           string         `json:"name"`
