@@ -29,6 +29,14 @@ type Client struct {
 	CreatedAt    time.Time `json:"created_at"`
 }
 
+type Permission struct {
+	ID        int32        `json:"id"`
+	UserID    int32        `json:"user_id"`
+	ClientID  string       `json:"client_id"`
+	Allowed   bool         `json:"allowed"`
+	GrantedAt sql.NullTime `json:"granted_at"`
+}
+
 type User struct {
 	ID             int64          `json:"id"`
 	Name           string         `json:"name"`

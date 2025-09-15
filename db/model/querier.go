@@ -11,9 +11,11 @@ import (
 type Querier interface {
 	CreateAuthCode(ctx context.Context, arg CreateAuthCodeParams) (AuthCode, error)
 	CreateClient(ctx context.Context, arg CreateClientParams) (Client, error)
+	CreatePermission(ctx context.Context, arg CreatePermissionParams) (Permission, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetAuthCode(ctx context.Context, code string) (AuthCode, error)
 	GetClientByID(ctx context.Context, id string) (Client, error)
+	GetPermissionByUserAndClient(ctx context.Context, arg GetPermissionByUserAndClientParams) (Permission, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id int64) (User, error)
 }

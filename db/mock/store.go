@@ -71,6 +71,21 @@ func (mr *MockStoreMockRecorder) CreateClient(ctx, arg any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClient", reflect.TypeOf((*MockStore)(nil).CreateClient), ctx, arg)
 }
 
+// CreatePermission mocks base method.
+func (m *MockStore) CreatePermission(ctx context.Context, arg db.CreatePermissionParams) (db.Permission, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreatePermission", ctx, arg)
+	ret0, _ := ret[0].(db.Permission)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreatePermission indicates an expected call of CreatePermission.
+func (mr *MockStoreMockRecorder) CreatePermission(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePermission", reflect.TypeOf((*MockStore)(nil).CreatePermission), ctx, arg)
+}
+
 // CreateUser mocks base method.
 func (m *MockStore) CreateUser(ctx context.Context, arg db.CreateUserParams) (db.User, error) {
 	m.ctrl.T.Helper()
@@ -114,6 +129,21 @@ func (m *MockStore) GetClientByID(ctx context.Context, id string) (db.Client, er
 func (mr *MockStoreMockRecorder) GetClientByID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClientByID", reflect.TypeOf((*MockStore)(nil).GetClientByID), ctx, id)
+}
+
+// GetPermissionByUserAndClient mocks base method.
+func (m *MockStore) GetPermissionByUserAndClient(ctx context.Context, arg db.GetPermissionByUserAndClientParams) (db.Permission, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPermissionByUserAndClient", ctx, arg)
+	ret0, _ := ret[0].(db.Permission)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPermissionByUserAndClient indicates an expected call of GetPermissionByUserAndClient.
+func (mr *MockStoreMockRecorder) GetPermissionByUserAndClient(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPermissionByUserAndClient", reflect.TypeOf((*MockStore)(nil).GetPermissionByUserAndClient), ctx, arg)
 }
 
 // GetUserByEmail mocks base method.

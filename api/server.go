@@ -52,7 +52,6 @@ func (server *Server) Router() {
 	})
 
 	router.POST("/create_user", server.CreateUserHandler)
-
 	router.GET("/authorize", server.AuthorizeGetHandler)
 	//router.POST("/authorize")
 	router.POST("/token", server.TokenPostHandler)
