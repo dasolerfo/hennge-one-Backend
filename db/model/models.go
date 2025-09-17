@@ -31,7 +31,7 @@ type Client struct {
 
 type Permission struct {
 	ID        int32        `json:"id"`
-	UserID    int32        `json:"user_id"`
+	UserID    int64        `json:"user_id"`
 	ClientID  string       `json:"client_id"`
 	Allowed   bool         `json:"allowed"`
 	GrantedAt sql.NullTime `json:"granted_at"`

@@ -18,6 +18,7 @@ type Querier interface {
 	GetPermissionByUserAndClient(ctx context.Context, arg GetPermissionByUserAndClientParams) (Permission, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id int64) (User, error)
+	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) (Permission, error)
 }
 
 var _ Querier = (*Queries)(nil)

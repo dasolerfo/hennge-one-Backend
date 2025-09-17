@@ -16,7 +16,7 @@ RETURNING id, user_id, client_id, allowed, granted_at
 `
 
 type CreatePermissionParams struct {
-	UserID   int32  `json:"user_id"`
+	UserID   int64  `json:"user_id"`
 	ClientID string `json:"client_id"`
 	Allowed  bool   `json:"allowed"`
 }
@@ -40,12 +40,37 @@ WHERE user_id = $1 AND client_id = $2
 `
 
 type GetPermissionByUserAndClientParams struct {
-	UserID   int32  `json:"user_id"`
+	UserID   int64  `json:"user_id"`
 	ClientID string `json:"client_id"`
 }
 
 func (q *Queries) GetPermissionByUserAndClient(ctx context.Context, arg GetPermissionByUserAndClientParams) (Permission, error) {
 	row := q.db.QueryRowContext(ctx, getPermissionByUserAndClient, arg.UserID, arg.ClientID)
+	var i Permission
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ClientID,
+		&i.Allowed,
+		&i.GrantedAt,
+	)
+	return i, err
+}
+
+const updatePermission = `-- name: UpdatePermission :one
+UPDATE permissions set allowed = $3, granted_at = NOW()
+WHERE user_id = $1 AND client_id = $2
+RETURNING id, user_id, client_id, allowed, granted_at
+`
+
+type UpdatePermissionParams struct {
+	UserID   int64  `json:"user_id"`
+	ClientID string `json:"client_id"`
+	Allowed  bool   `json:"allowed"`
+}
+
+func (q *Queries) UpdatePermission(ctx context.Context, arg UpdatePermissionParams) (Permission, error) {
+	row := q.db.QueryRowContext(ctx, updatePermission, arg.UserID, arg.ClientID, arg.Allowed)
 	var i Permission
 	err := row.Scan(
 		&i.ID,

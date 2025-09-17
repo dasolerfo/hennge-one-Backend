@@ -1,6 +1,6 @@
 CREATE TABLE permissions (
     "id" SERIAL PRIMARY KEY,
-    "user_id" INTEGER NOT NULL,
+    "user_id" BIGINT NOT NULL,
     "client_id" TEXT NOT NULL,
     "allowed" BOOLEAN NOT NULL DEFAULT FALSE,
     "granted_at" TIMESTAMP DEFAULT NOW()    
