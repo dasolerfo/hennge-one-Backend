@@ -6,7 +6,7 @@ import (
 )
 
 type ClientRegisterRequest struct {
-	ClientID     string   `json:"client_id" binding:"required,unique"`
+	ClientID     string   `json:"client_id" binding:"required"`
 	ClientName   string   `json:"client_name" binding:"required"`
 	ClientSecret string   `json:"client_secret" binding:"required"`
 	RedirectUris []string `json:"redirect_uris" binding:"required"`
