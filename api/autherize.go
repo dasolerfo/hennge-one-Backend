@@ -48,34 +48,49 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 
 	session := sessions.Default(c)
 	userID := session.Get(SessionCodeKey)
+	validAuth := session.Get(ValidUntil)
 
-	if userID != nil {
-		accessCode, err := help.GenerateCode(32)
-		if err != nil {
-			c.HTML(500, "login.html", gin.H{"err": "Internal server error"})
-			return
+	if userID != nil && validAuth != nil {
+		if time.Now().Before(validAuth.(time.Time)) {
+			if req.Prompt == "login" {
+				c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
+				return
+			}
+			_, err := server.store.GetUserByID(c.Request.Context(), userID.(int64))
+
+			if err != nil && err == sql.ErrNoRows {
+				c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
+				return
+			} else if err != nil {
+				redirectWithError := req.RedirectUri + "?error=server_error&error_description=Internal+server+error&state=" + req.State
+				c.Redirect(http.StatusFound, redirectWithError)
+				return
+			}
+
+			permission, err := server.store.GetPermissionByUserAndClient(c.Request.Context(), db.GetPermissionByUserAndClientParams{
+				UserID:   userID.(int64),
+				ClientID: req.ClintId,
+			})
+
+			if err != nil && err == sql.ErrNoRows {
+				redirectWithError := req.RedirectUri + "?error=unauthorized_client&error_description=The+client+is+not+authorized+by+the+user&state=" + req.State
+				c.Redirect(http.StatusFound, redirectWithError)
+				return
+			} else if err != nil {
+				redirectWithError := req.RedirectUri + "?error=server_error&error_description=Internal+server+error&state=" + req.State
+				c.Redirect(http.StatusFound, redirectWithError)
+				return
+			}
+
+			if !permission.Allowed {
+				redirectWithError := req.RedirectUri + "?error=unauthorized_client&error_description=The+client+is+not+authorized+by+the+user&state=" + req.State
+				c.Redirect(http.StatusFound, redirectWithError)
+				return
+			}
+
+			ReturnToRedirectURI(*server, req, userID, c)
+
 		}
-
-		authCode, err := server.store.CreateAuthCode(c.Request.Context(), db.CreateAuthCodeParams{
-			Code:          accessCode,
-			ClientID:      req.ClintId,
-			RedirectUri:   req.RedirectUri,
-			Sub:           userID.(string),
-			Scope:         sql.NullString{String: req.Scope, Valid: true},
-			ExpiresAt:     time.Now().Add(server.Config.CodeExpirationTime),
-			CodeChallenge: sql.NullString{String: "RS256", Valid: true},
-			Nonce:         sql.NullString{String: req.Nonce, Valid: true},
-		})
-
-		if err != nil {
-			c.HTML(500, "login.html", gin.H{"err": "Internal server error"})
-			return
-		}
-
-		//if authCode  {
-		c.Redirect(http.StatusFound, authCode.RedirectUri+"?code="+authCode.Code+"&state="+req.State)
-		return
-		//}
 
 	}
 
@@ -93,6 +108,36 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 
 	c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
 	return
+}
+
+func ReturnToRedirectURI(server Server, req AuthorizeGetHandlerRequest, userID interface{}, c *gin.Context) {
+
+	accessCode, err := help.GenerateCode(32)
+	if err != nil {
+		c.HTML(500, "login.html", gin.H{"err": "Internal server error"})
+		return
+	}
+
+	authCode, err := server.store.CreateAuthCode(c.Request.Context(), db.CreateAuthCodeParams{
+		Code:          accessCode,
+		ClientID:      req.ClintId,
+		RedirectUri:   req.RedirectUri,
+		Sub:           userID.(string),
+		Scope:         sql.NullString{String: req.Scope, Valid: true},
+		ExpiresAt:     time.Now().Add(server.Config.CodeExpirationTime),
+		CodeChallenge: sql.NullString{String: "RS256", Valid: true},
+		Nonce:         sql.NullString{String: req.Nonce, Valid: true},
+	})
+
+	if err != nil {
+		c.HTML(500, "login.html", gin.H{"err": "Internal server error"})
+		return
+	}
+
+	//if authCode  {
+	c.Redirect(http.StatusFound, authCode.RedirectUri+"?code="+authCode.Code+"&state="+req.State)
+	return
+	//}
 }
 
 type InitiateLoginHandlerRequest struct {

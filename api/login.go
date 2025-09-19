@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"strconv"
+	"time"
 
 	db "github.com/dasolerfo/hennge-one-Backend.git/db/model"
 	"github.com/dasolerfo/hennge-one-Backend.git/help"
@@ -12,6 +13,7 @@ import (
 
 const (
 	SessionCodeKey = "loggedCode"
+	ValidUntil     = "validUntil"
 )
 
 type DisplayLoginPageRequest struct {
@@ -58,6 +60,7 @@ func (server *Server) LoginPostHandler(c *gin.Context) {
 
 	session := sessions.Default(c)
 	session.Set(SessionCodeKey, id)
+	session.Set(ValidUntil, time.Now().Add(10*time.Minute))
 	session.Save()
 
 	c.Redirect(302, "/authorize?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
