@@ -49,72 +49,55 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	userID := session.Get(SessionCodeKey)
 	state := session.Get(StateCode)
-	//TODO: Millorar aquesta chapuza
-	var validAuth time.Time
-	var valid bool
-	validAuthStr, _ := session.Get(ValidUntil).(string)
-	validAuth, err := time.Parse(time.RFC3339, validAuthStr)
-	if err != nil {
 
-	}
-	//fmt.Println(err)
-	if validAuthStr != "" {
-		if time.Now().Before(validAuth) {
-			valid = true
-		} else {
-			c.JSON(401, gin.H{
-				"valid": validAuth.Format(time.RFC3339),
-				"now":   time.Now().Format(time.RFC3339),
-			})
-		}
+	//var validAuth time.Time
+	//var valid bool
+	//validAuthStr, _ := session.Get(ValidUntil).(string)
+	//validAuth, err := time.Parse(time.RFC3339, validAuthStr)
 
-	}
-
-	if req.Prompt == "login" && state != nil {
+	if (req.Prompt == "login" && state == nil) || (req.Prompt == "login" && state.(string) != req.State) {
 		if state.(string) != req.State {
 			c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=falloAqui")
 			return
 		}
 	}
 
-	if userID != nil && valid {
+	if userID != nil {
 
-		if time.Now().Before(validAuth) {
-			_, err := server.store.GetUserByID(c.Request.Context(), userID.(int64))
+		_, err := server.store.GetUserByID(c.Request.Context(), userID.(int64))
 
-			if err != nil && err == sql.ErrNoRows {
-				c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=NopeFalloAqui")
-				return
-			} else if err != nil {
-				redirectWithError := req.RedirectUri + "?error=server_error&error_description=Internal+server+error&state=" + req.State
-				c.Redirect(http.StatusFound, redirectWithError)
-				return
-			}
-
-			permission, err := server.store.GetPermissionByUserAndClient(c.Request.Context(), db.GetPermissionByUserAndClientParams{
-				UserID:   userID.(int64),
-				ClientID: req.ClintId,
-			})
-
-			if err != nil && err == sql.ErrNoRows {
-				redirectWithError := req.RedirectUri + "?error=unauthorized_client&error_description=The+client+is+not+authorized+by+the+user&state=" + req.State
-				c.Redirect(http.StatusFound, redirectWithError)
-				return
-			} else if err != nil {
-				redirectWithError := req.RedirectUri + "?error=server_error&error_description=Internal+server+error&state=" + req.State
-				c.Redirect(http.StatusFound, redirectWithError)
-				return
-			}
-
-			if !permission.Allowed {
-				redirectWithError := req.RedirectUri + "?error=unauthorized_client&error_description=The+client+is+not+authorized+by+the+user&state=" + req.State
-				c.Redirect(http.StatusFound, redirectWithError)
-				return
-			}
-			// Everything is correct, return to the redirect URI with the code
-			ReturnToRedirectURI(*server, req, userID, c)
-
+		if err != nil && err == sql.ErrNoRows {
+			c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=NopeFalloAqui")
+			return
+		} else if err != nil {
+			redirectWithError := req.RedirectUri + "?error=server_error&error_description=Internal+server+error&state=" + req.State
+			c.Redirect(http.StatusFound, redirectWithError)
+			return
 		}
+
+		permission, err := server.store.GetPermissionByUserAndClient(c.Request.Context(), db.GetPermissionByUserAndClientParams{
+			UserID:   userID.(int64),
+			ClientID: req.ClintId,
+		})
+
+		if err != nil && err == sql.ErrNoRows {
+			redirectWithError := req.RedirectUri + "?error=unauthorized_client&error_description=The+client+is+not+authorized+by+the+user&state=" + req.State
+			c.Redirect(http.StatusFound, redirectWithError)
+			return
+		} else if err != nil {
+			redirectWithError := req.RedirectUri + "?error=server_error&error_description=Internal+server+error&state=" + req.State
+			c.Redirect(http.StatusFound, redirectWithError)
+			return
+		}
+
+		if !permission.Allowed {
+			redirectWithError := req.RedirectUri + "?error=unauthorized_client&error_description=The+client+is+not+authorized+by+the+user&state=" + req.State
+			c.Redirect(http.StatusFound, redirectWithError)
+			return
+		}
+		// Everything is correct, return to the redirect URI with the code
+		ReturnToRedirectURI(*server, req, userID, c)
+
 		c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=TornoAqui")
 		return
 

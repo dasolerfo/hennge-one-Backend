@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"strconv"
-	"time"
 
 	db "github.com/dasolerfo/hennge-one-Backend.git/db/model"
 	"github.com/dasolerfo/hennge-one-Backend.git/help"
@@ -61,7 +60,7 @@ func (server *Server) LoginPostHandler(c *gin.Context) {
 
 	session := sessions.Default(c)
 	session.Set(SessionCodeKey, id)
-	session.Set(ValidUntil, time.Now().Add(10*time.Minute).Format(time.RFC3339))
+	//session.Set(ValidUntil, time.Now().Add(10*time.Minute).Format(time.RFC3339))
 	session.Set(StateCode, req.State)
 	session.Save()
 
