@@ -54,13 +54,8 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	var valid bool
 	validAuthStr, _ := session.Get(ValidUntil).(string)
 	validAuth, err := time.Parse(time.RFC3339, validAuthStr)
-	if err == nil && time.Now().Before(validAuth) {
+	if err != nil && time.Now().Before(validAuth) {
 		valid = true
-	} else {
-		c.JSON(401, gin.H{
-			"string": validAuthStr,
-			"dades":  validAuth.Format(time.RFC3339),
-		})
 	}
 
 	if req.Prompt == "login" && state != nil {
