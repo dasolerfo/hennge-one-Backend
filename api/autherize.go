@@ -48,14 +48,18 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 
 	session := sessions.Default(c)
 	userID := session.Get(SessionCodeKey)
+	state := session.Get(StateCode)
 	validAuth := session.Get(ValidUntil)
+
+	if req.Prompt == "login" && state != nil {
+		if state.(string) != req.State {
+			c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
+			return
+		}
+	}
 
 	if userID != nil && validAuth != nil {
 		if time.Now().Before(validAuth.(time.Time)) {
-			if req.Prompt == "login" {
-				c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
-				return
-			}
 			_, err := server.store.GetUserByID(c.Request.Context(), userID.(int64))
 
 			if err != nil && err == sql.ErrNoRows {
@@ -87,7 +91,6 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 				c.Redirect(http.StatusFound, redirectWithError)
 				return
 			}
-
 			ReturnToRedirectURI(*server, req, userID, c)
 
 		}
