@@ -49,7 +49,15 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	userID := session.Get(SessionCodeKey)
 	state := session.Get(StateCode)
-	validAuth := session.Get(ValidUntil)
+	//TODO: Millorar aquesta chapuza
+	var validAuth time.Time
+	var valid bool
+	if validAuthStr, ok := session.Get(ValidUntil).(string); ok {
+		validAuth, err := time.Parse(time.RFC3339, validAuthStr)
+		if err == nil && time.Now().Before(validAuth) {
+			valid = true
+		}
+	}
 
 	if req.Prompt == "login" && state != nil {
 		if state.(string) != req.State {
@@ -58,8 +66,8 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 		}
 	}
 
-	if userID != nil && validAuth != nil {
-		if time.Now().Before(validAuth.(time.Time)) {
+	if userID != nil && valid {
+		if time.Now().Before(validAuth) {
 			_, err := server.store.GetUserByID(c.Request.Context(), userID.(int64))
 
 			if err != nil && err == sql.ErrNoRows {
