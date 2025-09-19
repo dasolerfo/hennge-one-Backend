@@ -95,6 +95,8 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 			ReturnToRedirectURI(*server, req, userID, c)
 
 		}
+		c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=TornoAqui")
+		return
 
 	}
 
@@ -110,7 +112,7 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=TornoAqui")
+	c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=PetoPerValidesa")
 
 	return
 }
