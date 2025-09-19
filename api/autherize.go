@@ -66,6 +66,12 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	}
 
 	if userID != nil && valid {
+		c.JSON(200, gin.H{
+			"temps":  validAuth.Format(time.RFC3339),
+			"userID": userID,
+			"valid":  valid,
+		})
+		return
 		if time.Now().Before(validAuth) {
 			_, err := server.store.GetUserByID(c.Request.Context(), userID.(int64))
 
