@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -54,8 +55,15 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	var valid bool
 	validAuthStr, _ := session.Get(ValidUntil).(string)
 	validAuth, err := time.Parse(time.RFC3339, validAuthStr)
-	if err != nil && time.Now().Before(validAuth) {
+	fmt.Println(err)
+
+	if time.Now().Before(validAuth) {
 		valid = true
+	} else {
+		c.JSON(401, gin.H{
+			"valid": validAuth.Format(time.RFC3339),
+			"now":   time.Now().Format(time.RFC3339),
+		})
 	}
 
 	if req.Prompt == "login" && state != nil {
@@ -66,12 +74,7 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	}
 
 	if userID != nil && valid {
-		c.JSON(200, gin.H{
-			"temps":  validAuth.Format(time.RFC3339),
-			"userID": userID,
-			"valid":  valid,
-		})
-		return
+
 		if time.Now().Before(validAuth) {
 			_, err := server.store.GetUserByID(c.Request.Context(), userID.(int64))
 
