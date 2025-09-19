@@ -50,12 +50,7 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	userID := session.Get(SessionCodeKey)
 	state := session.Get(StateCode)
 
-	//var validAuth time.Time
-	//var valid bool
-	//validAuthStr, _ := session.Get(ValidUntil).(string)
-	//validAuth, err := time.Parse(time.RFC3339, validAuthStr)
-
-	if (req.Prompt == "login" && state == nil) || (req.Prompt == "login" && state.(string) != req.State) {
+	if req.Prompt == "login" && state != nil {
 		if state.(string) != req.State {
 			c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=falloAqui")
 			return
