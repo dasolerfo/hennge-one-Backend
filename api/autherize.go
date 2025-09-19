@@ -53,7 +53,7 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 
 	if req.Prompt == "login" && state != nil {
 		if state.(string) != req.State {
-			c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
+			c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=falloAqui")
 			return
 		}
 	}
@@ -63,7 +63,7 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 			_, err := server.store.GetUserByID(c.Request.Context(), userID.(int64))
 
 			if err != nil && err == sql.ErrNoRows {
-				c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
+				c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=NopeFalloAqui")
 				return
 			} else if err != nil {
 				redirectWithError := req.RedirectUri + "?error=server_error&error_description=Internal+server+error&state=" + req.State
@@ -91,6 +91,7 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 				c.Redirect(http.StatusFound, redirectWithError)
 				return
 			}
+			// Everything is correct, return to the redirect URI with the code
 			ReturnToRedirectURI(*server, req, userID, c)
 
 		}
@@ -109,7 +110,8 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
+	c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=TornoAqui")
+
 	return
 }
 

@@ -53,7 +53,8 @@ func (server *Server) Router() {
 
 	router.POST("/create_user", server.CreateUserHandler)
 	router.GET("/authorize", server.AuthorizeGetHandler)
-	//router.POST("/authorize")
+
+	// OAuth2 endpointss
 	router.POST("/token", server.TokenPostHandler)
 	router.GET("/login", server.DisplayLoginPage)
 	router.POST("/login", server.LoginPostHandler)
