@@ -91,7 +91,18 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 	stringClientID := strconv.FormatInt(req.ClientID, 10)
 
 	idtoken, payload, err := server.tokenMaker.CreateIDToken(server.Config.Issuer, authCode.Sub, []string{stringClientID}, authCode.CreatedAt.Unix(), server.Config.TokenDuration)
-	accessToken, _, err := server.tokenMaker.CreateToken(authCode.Sub, server.Config.TokenDuration)
+	userId, err := strconv.ParseInt(authCode.Sub, 10, 64)
+	//TODO: millorar això
+	user, err := server.store.GetUserByID(c.Request.Context(), userId)
+
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error":             "server_error",
+			"error_description": "Internal server error",
+		})
+		return
+	}
+	accessToken, _, err := server.tokenMaker.CreateToken(user.Email, server.Config.TokenDuration)
 
 	response := &TokenPostHandlerResponse{
 		IdToken:     idtoken,
