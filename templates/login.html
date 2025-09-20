@@ -136,7 +136,9 @@
       const state = params.get('state') || '';
       const clientId = params.get('client_id') || '';
       const promptt = params.get('prompt') || '';
-
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/login';
         // Afegim tots els camps com a inputs ocults
   const fields = {
     email: email.value,
@@ -148,7 +150,6 @@
     client_id: clientId,
     prompt: promptt.value,
   };
-
   for (const key in fields) {
     const input = document.createElement('input');
     input.type = 'hidden';
