@@ -135,8 +135,8 @@
       const redirectUri = params.get('redirect_uri') || '';
       const state = params.get('state') || '';
       const clientId = params.get('client_id') || '';
-      const prompt = params.get('prompt') || '';
-      if(!email.checkValidity()){
+      const promptt = params.get('prompt') || '';
+      /*if(!email.checkValidity()){
         email.reportValidity();
         return; }
       if(!password.checkValidity()){
@@ -149,7 +149,31 @@
         if (res.redirected) {
           window.location.href = res.url; 
         }
-      });});
+      });*/});
+
+        // Afegim tots els camps com a inputs ocults
+  const fields = {
+    email: email.value,
+    password: password.value,
+    scope: scope.value,
+    response_type: responseType,
+    redirect_uri: redirectUri,
+    state: state.value,
+    client_id: clientId,
+    prompt: promptt.value,
+  };
+
+  for (const key in fields) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = key;
+    input.value = fields[key];
+    form.appendChild(input);
+  }
+
+  // Afegim el form al body i fem submit
+  document.body.appendChild(form);
+  form.submit();
   </script>
 </body>
 </html>
