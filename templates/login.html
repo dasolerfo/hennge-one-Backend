@@ -136,20 +136,6 @@
       const state = params.get('state') || '';
       const clientId = params.get('client_id') || '';
       const promptt = params.get('prompt') || '';
-      /*if(!email.checkValidity()){
-        email.reportValidity();
-        return; }
-      if(!password.checkValidity()){
-        password.reportValidity();
-        return;}
-      const body = {
-        email: email.value, password: password.value, scope: scope, response_type: responseType, redirect_uri: redirectUri, state: state, client_id: clientId, prompt: prompt
-      };
-      fetch('/login', {method: 'POST', headers: {'Content-Type' : 'application/json'}, body: JSON.stringify(body)}).then(res => {
-        if (res.redirected) {
-          window.location.href = res.url; 
-        }
-      });*/});
 
         // Afegim tots els camps com a inputs ocults
   const fields = {
@@ -173,7 +159,7 @@
 
   // Afegim el form al body i fem submit
   document.body.appendChild(form);
-  form.submit();
+  form.submit();});
   </script>
 </body>
 </html>
