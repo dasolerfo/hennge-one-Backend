@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	db "github.com/dasolerfo/hennge-one-Backend.git/db/model"
@@ -58,8 +59,8 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	}
 
 	if userID != nil {
-
-		_, err := server.store.GetUserByID(c.Request.Context(), userID.(int64))
+		userIDInt64, err := strconv.ParseInt(userID.(string), 10, 64)
+		_, err = server.store.GetUserByID(c.Request.Context(), userIDInt64)
 
 		if err != nil && err == sql.ErrNoRows {
 			c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=NopeFalloAqui")
@@ -71,7 +72,7 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 		}
 
 		permission, err := server.store.GetPermissionByUserAndClient(c.Request.Context(), db.GetPermissionByUserAndClientParams{
-			UserID:   userID.(int64),
+			UserID:   userIDInt64,
 			ClientID: req.ClintId,
 		})
 
