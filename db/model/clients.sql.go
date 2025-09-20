@@ -12,13 +12,14 @@ import (
 )
 
 const createClient = `-- name: CreateClient :one
-INSERT INTO clients (id, client_name, client_secret, redirect_uris)
-VALUES ($1, $2, $3, $4)
-RETURNING id, client_name, client_secret, redirect_uris, created_at
+INSERT INTO clients (id, client_source, client_name, client_secret, redirect_uris)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, client_source, client_name, client_secret, redirect_uris, created_at
 `
 
 type CreateClientParams struct {
-	ID           string   `json:"id"`
+	ID           int64    `json:"id"`
+	ClientSource string   `json:"client_source"`
 	ClientName   string   `json:"client_name"`
 	ClientSecret string   `json:"client_secret"`
 	RedirectUris []string `json:"redirect_uris"`
@@ -27,6 +28,7 @@ type CreateClientParams struct {
 func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Client, error) {
 	row := q.db.QueryRowContext(ctx, createClient,
 		arg.ID,
+		arg.ClientSource,
 		arg.ClientName,
 		arg.ClientSecret,
 		pq.Array(arg.RedirectUris),
@@ -34,6 +36,7 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Cli
 	var i Client
 	err := row.Scan(
 		&i.ID,
+		&i.ClientSource,
 		&i.ClientName,
 		&i.ClientSecret,
 		pq.Array(&i.RedirectUris),
@@ -43,15 +46,16 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Cli
 }
 
 const getClientByID = `-- name: GetClientByID :one
-SELECT id, client_name, client_secret, redirect_uris, created_at FROM clients
+SELECT id, client_source, client_name, client_secret, redirect_uris, created_at FROM clients
 WHERE id = $1
 `
 
-func (q *Queries) GetClientByID(ctx context.Context, id string) (Client, error) {
+func (q *Queries) GetClientByID(ctx context.Context, id int64) (Client, error) {
 	row := q.db.QueryRowContext(ctx, getClientByID, id)
 	var i Client
 	err := row.Scan(
 		&i.ID,
+		&i.ClientSource,
 		&i.ClientName,
 		&i.ClientSecret,
 		pq.Array(&i.RedirectUris),

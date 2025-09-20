@@ -117,7 +117,7 @@ func (mr *MockStoreMockRecorder) GetAuthCode(ctx, code any) *gomock.Call {
 }
 
 // GetClientByID mocks base method.
-func (m *MockStore) GetClientByID(ctx context.Context, id string) (db.Client, error) {
+func (m *MockStore) GetClientByID(ctx context.Context, id int64) (db.Client, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetClientByID", ctx, id)
 	ret0, _ := ret[0].(db.Client)

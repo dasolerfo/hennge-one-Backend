@@ -16,9 +16,9 @@ RETURNING id, user_id, client_id, allowed, granted_at
 `
 
 type CreatePermissionParams struct {
-	UserID   int64  `json:"user_id"`
-	ClientID string `json:"client_id"`
-	Allowed  bool   `json:"allowed"`
+	UserID   int64 `json:"user_id"`
+	ClientID int64 `json:"client_id"`
+	Allowed  bool  `json:"allowed"`
 }
 
 func (q *Queries) CreatePermission(ctx context.Context, arg CreatePermissionParams) (Permission, error) {
@@ -40,8 +40,8 @@ WHERE user_id = $1 AND client_id = $2
 `
 
 type GetPermissionByUserAndClientParams struct {
-	UserID   int64  `json:"user_id"`
-	ClientID string `json:"client_id"`
+	UserID   int64 `json:"user_id"`
+	ClientID int64 `json:"client_id"`
 }
 
 func (q *Queries) GetPermissionByUserAndClient(ctx context.Context, arg GetPermissionByUserAndClientParams) (Permission, error) {
@@ -64,9 +64,9 @@ RETURNING id, user_id, client_id, allowed, granted_at
 `
 
 type UpdatePermissionParams struct {
-	UserID   int64  `json:"user_id"`
-	ClientID string `json:"client_id"`
-	Allowed  bool   `json:"allowed"`
+	UserID   int64 `json:"user_id"`
+	ClientID int64 `json:"client_id"`
+	Allowed  bool  `json:"allowed"`
 }
 
 func (q *Queries) UpdatePermission(ctx context.Context, arg UpdatePermissionParams) (Permission, error) {

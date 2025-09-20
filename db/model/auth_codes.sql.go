@@ -19,7 +19,7 @@ INSERT INTO auth_codes (
 
 type CreateAuthCodeParams struct {
 	Code          string         `json:"code"`
-	ClientID      string         `json:"client_id"`
+	ClientID      int64          `json:"client_id"`
 	RedirectUri   string         `json:"redirect_uri"`
 	Sub           string         `json:"sub"`
 	Scope         sql.NullString `json:"scope"`

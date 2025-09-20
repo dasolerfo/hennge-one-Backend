@@ -58,8 +58,18 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 		}
 	}
 
+	if state.(string) != req.State {
+		c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=falloAqui")
+		return
+	}
+
 	if userID != nil {
 		userIDInt64, err := strconv.ParseInt(userID.(string), 10, 64)
+		if err != nil {
+			redirectWithError := req.RedirectUri + "?error=invalid_client&error_description=The+user+ID+is+invalid&state=" + req.State
+			c.Redirect(http.StatusFound, redirectWithError)
+			return
+		}
 		_, err = server.store.GetUserByID(c.Request.Context(), userIDInt64)
 
 		if err != nil && err == sql.ErrNoRows {
@@ -71,9 +81,16 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 			return
 		}
 
+		clientID, err := strconv.ParseInt(req.ClintId, 10, 64)
+		if err != nil {
+			redirectWithError := req.RedirectUri + "?error=invalid_client&error_description=The+client+ID+is+invalid&state=" + req.State
+			c.Redirect(http.StatusFound, redirectWithError)
+			return
+		}
+
 		permission, err := server.store.GetPermissionByUserAndClient(c.Request.Context(), db.GetPermissionByUserAndClientParams{
 			UserID:   userIDInt64,
-			ClientID: req.ClintId,
+			ClientID: clientID,
 		})
 
 		if err != nil && err == sql.ErrNoRows {
@@ -123,10 +140,17 @@ func ReturnToRedirectURI(server Server, req AuthorizeGetHandlerRequest, userID i
 		c.HTML(500, "login.html", gin.H{"err": "Internal server error"})
 		return
 	}
+	clientID, err := strconv.ParseInt(req.ClintId, 10, 64)
+
+	if err != nil {
+		redirectWithError := req.RedirectUri + "?error=invalid_client&error_description=The+user+ID+is+invalid&state=" + req.State
+		c.Redirect(http.StatusFound, redirectWithError)
+		return
+	}
 
 	authCode, err := server.store.CreateAuthCode(c.Request.Context(), db.CreateAuthCodeParams{
 		Code:          accessCode,
-		ClientID:      req.ClintId,
+		ClientID:      clientID,
 		RedirectUri:   req.RedirectUri,
 		Sub:           userID.(string),
 		Scope:         sql.NullString{String: req.Scope, Valid: true},

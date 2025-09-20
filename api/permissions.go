@@ -8,9 +8,9 @@ import (
 )
 
 type PermissionPostRequest struct {
-	ClinetID string `json:"client_id" binding:"required"`
-	UserID   int64  `json:"user_id" binding:"required"`
-	Allowed  bool   `json:"allowed" binding:"required"`
+	ClinetID int64 `json:"client_id" binding:"required"`
+	UserID   int64 `json:"user_id" binding:"required"`
+	Allowed  bool  `json:"allowed" binding:"required"`
 }
 
 func (server *Server) PermissionPostHandler(c *gin.Context) {

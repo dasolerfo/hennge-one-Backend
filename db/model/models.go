@@ -11,7 +11,7 @@ import (
 
 type AuthCode struct {
 	Code          string         `json:"code"`
-	ClientID      string         `json:"client_id"`
+	ClientID      int64          `json:"client_id"`
 	RedirectUri   string         `json:"redirect_uri"`
 	Sub           string         `json:"sub"`
 	Scope         sql.NullString `json:"scope"`
@@ -22,7 +22,8 @@ type AuthCode struct {
 }
 
 type Client struct {
-	ID           string    `json:"id"`
+	ID           int64     `json:"id"`
+	ClientSource string    `json:"client_source"`
 	ClientName   string    `json:"client_name"`
 	ClientSecret string    `json:"client_secret"`
 	RedirectUris []string  `json:"redirect_uris"`
@@ -32,7 +33,7 @@ type Client struct {
 type Permission struct {
 	ID        int32        `json:"id"`
 	UserID    int64        `json:"user_id"`
-	ClientID  string       `json:"client_id"`
+	ClientID  int64        `json:"client_id"`
 	Allowed   bool         `json:"allowed"`
 	GrantedAt sql.NullTime `json:"granted_at"`
 }

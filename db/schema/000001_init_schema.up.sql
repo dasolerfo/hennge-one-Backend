@@ -9,7 +9,7 @@ CREATE TABLE "users" (
 );
 CREATE TABLE auth_codes (
     "code" TEXT PRIMARY KEY,
-    "client_id" TEXT NOT NULL,
+    "client_id" BIGINT NOT NULL,
     "redirect_uri" TEXT NOT NULL,
     "sub" TEXT NOT NULL,
     "scope" TEXT,
@@ -19,7 +19,8 @@ CREATE TABLE auth_codes (
     "expires_at" TIMESTAMPTZ NOT NULL
 );
 CREATE TABLE clients (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    "client_source" TEXT NOT NULL,
     "client_name" TEXT NOT NULL,
     "client_secret" TEXT NOT NULL,
     "redirect_uris" TEXT[] NOT NULL,

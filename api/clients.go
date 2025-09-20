@@ -6,7 +6,8 @@ import (
 )
 
 type ClientRegisterRequest struct {
-	ClientID     string   `json:"client_id" binding:"required"`
+	ClientID     int64    `json:"client_id" binding:"required"`
+	ClientSource string   `json:"client_source" binding:"required"`
 	ClientName   string   `json:"client_name" binding:"required"`
 	ClientSecret string   `json:"client_secret" binding:"required"`
 	RedirectUris []string `json:"redirect_uris" binding:"required"`
@@ -32,6 +33,7 @@ func (server *Server) RegisterClientHandler(c *gin.Context) {
 
 	client, err := server.store.CreateClient(c.Request.Context(), db.CreateClientParams{
 		ID:           req.ClientID,
+		ClientSource: req.ClientSource,
 		ClientName:   req.ClientName,
 		ClientSecret: req.ClientSecret,
 		RedirectUris: req.RedirectUris,
@@ -55,12 +57,12 @@ func (server *Server) RegisterClientHandler(c *gin.Context) {
 }
 
 type ClientsGetHandlerResponse struct {
-	ClientId string `json:"client_id" binding:"required"`
+	ClientId int64 `json:"client_id" binding:"required"`
 }
 
 func (server *Server) ClientsGetHandler(c *gin.Context) {
 	var req struct {
-		ClientId string `json:"client_id" binding:"required"`
+		ClientId int64 `json:"client_id" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{
@@ -80,6 +82,7 @@ func (server *Server) ClientsGetHandler(c *gin.Context) {
 	//TODO: Do not return client secret in production
 	c.JSON(200, gin.H{
 		"client_id":     client.ID,
+		"client_source": client.ClientSource,
 		"client_name":   client.ClientName,
 		"client_secret": client.ClientSecret,
 		"redirect_uris": client.RedirectUris,

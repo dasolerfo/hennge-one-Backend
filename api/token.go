@@ -1,6 +1,9 @@
 package api
 
 import (
+	"net/url"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,7 +13,7 @@ func TokenGetHandler(c *gin.Context) {
 
 type TokenPostHandlerRequest struct {
 	GrantType    string `form:"grant_type" binding:"required"`
-	ClientID     string `form:"client_id" binding:"required"`
+	ClientID     int64  `form:"client_id" binding:"required"`
 	ClientSecret string `form:"client_secret" binding:"required"`
 	RedirectUri  string `form:"redirect_uri" binding:"required"`
 	Code         string `form:"code" binding:"required"`
@@ -61,7 +64,17 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 		})
 		return
 	}
-	if req.RedirectUri != "" && authCode.RedirectUri != req.RedirectUri {
+	parsedRedirectUri, err := url.QueryUnescape(req.RedirectUri)
+
+	if err != nil || parsedRedirectUri == "" {
+		c.JSON(400, gin.H{
+			"error":             "invalid_request",
+			"error_description": "The redirect URI is not valid",
+		})
+		return
+	}
+
+	if req.RedirectUri != "" && authCode.RedirectUri != parsedRedirectUri {
 		c.JSON(400, gin.H{
 			"error":             "invalid_grant",
 			"error_description": "The redirect URI does not match with the one used in the authorization request",
@@ -75,8 +88,9 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 		})
 		return
 	}
+	stringClientID := strconv.FormatInt(req.ClientID, 10)
 
-	idtoken, payload, err := server.tokenMaker.CreateIDToken(server.Config.Issuer, authCode.Sub, []string{req.ClientID}, authCode.CreatedAt.Unix(), server.Config.TokenDuration)
+	idtoken, payload, err := server.tokenMaker.CreateIDToken(server.Config.Issuer, authCode.Sub, []string{stringClientID}, authCode.CreatedAt.Unix(), server.Config.TokenDuration)
 	accessToken, _, err := server.tokenMaker.CreateToken(authCode.Sub, server.Config.TokenDuration)
 
 	response := &TokenPostHandlerResponse{
