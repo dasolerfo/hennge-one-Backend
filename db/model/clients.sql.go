@@ -63,3 +63,57 @@ func (q *Queries) GetClientByID(ctx context.Context, id int64) (Client, error) {
 	)
 	return i, err
 }
+
+const getClientBysource = `-- name: GetClientBysource :one
+SELECT id, client_source, client_name, client_secret, redirect_uris, created_at FROM clients
+WHERE client_source = $1
+`
+
+func (q *Queries) GetClientBysource(ctx context.Context, clientSource string) (Client, error) {
+	row := q.db.QueryRowContext(ctx, getClientBysource, clientSource)
+	var i Client
+	err := row.Scan(
+		&i.ID,
+		&i.ClientSource,
+		&i.ClientName,
+		&i.ClientSecret,
+		pq.Array(&i.RedirectUris),
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const listClients = `-- name: ListClients :many
+SELECT id, client_source, client_name, client_secret, redirect_uris, created_at FROM clients
+ORDER BY id
+`
+
+func (q *Queries) ListClients(ctx context.Context) ([]Client, error) {
+	rows, err := q.db.QueryContext(ctx, listClients)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Client{}
+	for rows.Next() {
+		var i Client
+		if err := rows.Scan(
+			&i.ID,
+			&i.ClientSource,
+			&i.ClientName,
+			&i.ClientSecret,
+			pq.Array(&i.RedirectUris),
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

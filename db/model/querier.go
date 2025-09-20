@@ -15,9 +15,11 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetAuthCode(ctx context.Context, code string) (AuthCode, error)
 	GetClientByID(ctx context.Context, id int64) (Client, error)
+	GetClientBysource(ctx context.Context, clientSource string) (Client, error)
 	GetPermissionByUserAndClient(ctx context.Context, arg GetPermissionByUserAndClientParams) (Permission, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id int64) (User, error)
+	ListClients(ctx context.Context) ([]Client, error)
 	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) (Permission, error)
 }
 

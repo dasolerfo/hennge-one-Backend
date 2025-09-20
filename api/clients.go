@@ -6,7 +6,6 @@ import (
 )
 
 type ClientRegisterRequest struct {
-	ClientID     int64    `json:"client_id" binding:"required"`
 	ClientSource string   `json:"client_source" binding:"required"`
 	ClientName   string   `json:"client_name" binding:"required"`
 	ClientSecret string   `json:"client_secret" binding:"required"`
@@ -22,7 +21,7 @@ func (server *Server) RegisterClientHandler(c *gin.Context) {
 		})
 		return
 	}
-	_, err := server.store.GetClientByID(c.Request.Context(), req.ClientID)
+	_, err := server.store.GetClientBysource(c.Request.Context(), req.ClientSource)
 	if err == nil {
 		c.JSON(400, gin.H{
 			"error":             "invalid_request",
@@ -32,7 +31,6 @@ func (server *Server) RegisterClientHandler(c *gin.Context) {
 	}
 
 	client, err := server.store.CreateClient(c.Request.Context(), db.CreateClientParams{
-		ID:           req.ClientID,
 		ClientSource: req.ClientSource,
 		ClientName:   req.ClientName,
 		ClientSecret: req.ClientSecret,

@@ -131,6 +131,21 @@ func (mr *MockStoreMockRecorder) GetClientByID(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClientByID", reflect.TypeOf((*MockStore)(nil).GetClientByID), ctx, id)
 }
 
+// GetClientBysource mocks base method.
+func (m *MockStore) GetClientBysource(ctx context.Context, clientSource string) (db.Client, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetClientBysource", ctx, clientSource)
+	ret0, _ := ret[0].(db.Client)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetClientBysource indicates an expected call of GetClientBysource.
+func (mr *MockStoreMockRecorder) GetClientBysource(ctx, clientSource any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClientBysource", reflect.TypeOf((*MockStore)(nil).GetClientBysource), ctx, clientSource)
+}
+
 // GetPermissionByUserAndClient mocks base method.
 func (m *MockStore) GetPermissionByUserAndClient(ctx context.Context, arg db.GetPermissionByUserAndClientParams) (db.Permission, error) {
 	m.ctrl.T.Helper()
@@ -174,6 +189,21 @@ func (m *MockStore) GetUserByID(ctx context.Context, id int64) (db.User, error) 
 func (mr *MockStoreMockRecorder) GetUserByID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockStore)(nil).GetUserByID), ctx, id)
+}
+
+// ListClients mocks base method.
+func (m *MockStore) ListClients(ctx context.Context) ([]db.Client, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListClients", ctx)
+	ret0, _ := ret[0].([]db.Client)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListClients indicates an expected call of ListClients.
+func (mr *MockStoreMockRecorder) ListClients(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListClients", reflect.TypeOf((*MockStore)(nil).ListClients), ctx)
 }
 
 // UpdatePermission mocks base method.
