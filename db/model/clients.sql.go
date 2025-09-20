@@ -12,13 +12,12 @@ import (
 )
 
 const createClient = `-- name: CreateClient :one
-INSERT INTO clients (id, client_source, client_name, client_secret, redirect_uris)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO clients (client_source, client_name, client_secret, redirect_uris)
+VALUES ($1, $2, $3, $4)
 RETURNING id, client_source, client_name, client_secret, redirect_uris, created_at
 `
 
 type CreateClientParams struct {
-	ID           int64    `json:"id"`
 	ClientSource string   `json:"client_source"`
 	ClientName   string   `json:"client_name"`
 	ClientSecret string   `json:"client_secret"`
@@ -27,7 +26,6 @@ type CreateClientParams struct {
 
 func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Client, error) {
 	row := q.db.QueryRowContext(ctx, createClient,
-		arg.ID,
 		arg.ClientSource,
 		arg.ClientName,
 		arg.ClientSecret,
