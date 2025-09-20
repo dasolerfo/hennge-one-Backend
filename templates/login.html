@@ -143,12 +143,12 @@
   const fields = {
     email: email.value,
     password: password.value,
-    scope: scope.value,
+    scope: scope,
     response_type: responseType,
     redirect_uri: redirectUri,
-    state: state.value,
+    state: state,
     client_id: clientId,
-    prompt: promptt.value,
+    prompt: promptt,
   };
   for (const key in fields) {
     const input = document.createElement('input');
