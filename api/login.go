@@ -30,19 +30,19 @@ func (server *Server) DisplayLoginPage(c *gin.Context) {
 }
 
 type LoginPostHandlerRequest struct {
-	Email        string `json:"email" binding:"required,email"`
-	Password     string `json:"password" binding:"required"`
-	Scope        string `json:"scope" binding:"required"`
-	ResponseType string `json:"response_type" binding:"required"`
-	RedirectUri  string `json:"redirect_uri" binding:"required"`
-	State        string `json:"state"`
-	ClintId      string `json:"client_id" binding:"required"`
-	Prompt       string `json:"prompt"`
+	Email        string `form:"email" binding:"required,email"`
+	Password     string `form:"password" binding:"required"`
+	Scope        string `form:"scope" binding:"required"`
+	ResponseType string `form:"response_type" binding:"required"`
+	RedirectUri  string `form:"redirect_uri" binding:"required"`
+	State        string `form:"state"`
+	ClintId      string `form:"client_id" binding:"required"`
+	Prompt       string `form:"prompt"`
 }
 
 func (server *Server) LoginPostHandler(c *gin.Context) {
 	var req LoginPostHandlerRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.HTML(401, "login.html", gin.H{"error": "Invalid request parameters"})
 	}
 	user, err := server.store.GetUserByEmail(c.Request.Context(), req.Email)
