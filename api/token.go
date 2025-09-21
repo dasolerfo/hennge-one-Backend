@@ -31,7 +31,7 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(400, gin.H{
 			"error":             "invalid_request",
-			"error_description": "Bad request has been made, please check the parameters",
+			"error_description": err.Error(),
 		})
 		return
 	}
