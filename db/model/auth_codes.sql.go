@@ -14,7 +14,7 @@ import (
 const createAuthCode = `-- name: CreateAuthCode :one
 INSERT INTO auth_codes (
     code, client_id, redirect_uri, sub, scope, code_challenge, nonce, expires_at
-) VALUES ( $1, $2, $3, $4, $5, $6, $7, $8 ) RETURNING code, client_id, redirect_uri, sub, scope, code_challenge, nonce, created_at, expires_at
+) VALUES ( $1, $2, $3, $4, $5, $6, $7, $8 ) RETURNING code, client_id, redirect_uri, sub, scope, code_challenge, nonce, created_at, expires_at, used
 `
 
 type CreateAuthCodeParams struct {
@@ -50,12 +50,13 @@ func (q *Queries) CreateAuthCode(ctx context.Context, arg CreateAuthCodeParams) 
 		&i.Nonce,
 		&i.CreatedAt,
 		&i.ExpiresAt,
+		&i.Used,
 	)
 	return i, err
 }
 
 const getAuthCode = `-- name: GetAuthCode :one
-SELECT code, client_id, redirect_uri, sub, scope, code_challenge, nonce, created_at, expires_at FROM auth_codes 
+SELECT code, client_id, redirect_uri, sub, scope, code_challenge, nonce, created_at, expires_at, used FROM auth_codes 
 WHERE code = $1 AND expires_at > now()
 `
 
@@ -72,6 +73,16 @@ func (q *Queries) GetAuthCode(ctx context.Context, code string) (AuthCode, error
 		&i.Nonce,
 		&i.CreatedAt,
 		&i.ExpiresAt,
+		&i.Used,
 	)
 	return i, err
+}
+
+const setCodeUsed = `-- name: SetCodeUsed :exec
+UPDATE auth_codes set used = TRUE WHERE code = $1
+`
+
+func (q *Queries) SetCodeUsed(ctx context.Context, code string) error {
+	_, err := q.db.ExecContext(ctx, setCodeUsed, code)
+	return err
 }

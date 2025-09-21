@@ -19,6 +19,7 @@ type AuthCode struct {
 	Nonce         sql.NullString `json:"nonce"`
 	CreatedAt     time.Time      `json:"created_at"`
 	ExpiresAt     time.Time      `json:"expires_at"`
+	Used          bool           `json:"used"`
 }
 
 type Client struct {

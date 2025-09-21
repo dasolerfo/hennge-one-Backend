@@ -20,6 +20,7 @@ type Querier interface {
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id int64) (User, error)
 	ListClients(ctx context.Context) ([]Client, error)
+	SetCodeUsed(ctx context.Context, code string) error
 	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) (Permission, error)
 }
 

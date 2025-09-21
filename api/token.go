@@ -43,6 +43,13 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 		})
 		return
 	}
+	if authCode.Used {
+		c.JSON(400, gin.H{
+			"error":             "invalid_grant",
+			"error_description": "The authorization code has already been used",
+		})
+		return
+	}
 	if authCode.ClientID != req.ClientID {
 		c.JSON(400, gin.H{
 			"error":             "invalid_grant",
@@ -87,6 +94,15 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 			"error_description": "The scope is not valid",
 		})
 		return
+	}
+	// Mark the code as used
+	err = server.store.SetCodeUsed(c.Request.Context(), req.Code)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error":             "server_error",
+			"error_description": "Internal server error",
+		})
+
 	}
 	stringClientID := strconv.FormatInt(req.ClientID, 10)
 

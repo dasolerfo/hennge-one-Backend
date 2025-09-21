@@ -16,7 +16,8 @@ CREATE TABLE auth_codes (
     "code_challenge" TEXT,
     "nonce" TEXT,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-    "expires_at" TIMESTAMPTZ NOT NULL
+    "expires_at" TIMESTAMPTZ NOT NULL,
+    "used" BOOLEAN NOT NULL DEFAULT FALSE
 );
 CREATE TABLE clients (
     "id" BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,

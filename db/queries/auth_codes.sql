@@ -5,3 +5,5 @@ INSERT INTO auth_codes (
 -- name: GetAuthCode :one
 SELECT * FROM auth_codes 
 WHERE code = $1 AND expires_at > now();
+-- name: SetCodeUsed :exec
+UPDATE auth_codes set used = TRUE WHERE code = $1;

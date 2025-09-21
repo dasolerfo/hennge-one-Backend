@@ -206,6 +206,20 @@ func (mr *MockStoreMockRecorder) ListClients(ctx any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListClients", reflect.TypeOf((*MockStore)(nil).ListClients), ctx)
 }
 
+// SetCodeUsed mocks base method.
+func (m *MockStore) SetCodeUsed(ctx context.Context, code string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetCodeUsed", ctx, code)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetCodeUsed indicates an expected call of SetCodeUsed.
+func (mr *MockStoreMockRecorder) SetCodeUsed(ctx, code any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetCodeUsed", reflect.TypeOf((*MockStore)(nil).SetCodeUsed), ctx, code)
+}
+
 // UpdatePermission mocks base method.
 func (m *MockStore) UpdatePermission(ctx context.Context, arg db.UpdatePermissionParams) (db.Permission, error) {
 	m.ctrl.T.Helper()
