@@ -47,10 +47,13 @@ func (server *Server) UserinfoGetHandler(c *gin.Context) {
 		"sub":    payload.ID.String(),
 		"name":   user.Name,
 		"email":  user.Email,
-		"gender": user.Gender,
+		"gender": "",
 	}
 	if user.EmailVerified {
 		response["email_verified"] = user.EmailVerified
+	}
+	if user.Gender.Valid {
+		response["geneder"] = user.Gender.String
 	}
 
 	c.JSON(200, response)

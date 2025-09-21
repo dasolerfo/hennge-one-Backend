@@ -44,6 +44,7 @@ func (server *Server) LoginPostHandler(c *gin.Context) {
 	var req LoginPostHandlerRequest
 	if err := c.ShouldBind(&req); err != nil {
 		c.HTML(401, "login.html", gin.H{"error": "Invalid request parameters"})
+		return
 	}
 	user, err := server.store.GetUserByEmail(c.Request.Context(), req.Email)
 	if err != nil {
