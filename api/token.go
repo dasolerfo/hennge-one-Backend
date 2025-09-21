@@ -39,7 +39,7 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error":             "invalid_grant",
-			"error_description": "Invalid authorization code or expired",
+			"error_description": err.Error(),
 		})
 		return
 	}
