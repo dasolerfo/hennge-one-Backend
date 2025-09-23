@@ -53,7 +53,7 @@ func (server *Server) UserinfoGetHandler(c *gin.Context) {
 		response["email_verified"] = user.EmailVerified
 	}
 	if user.Gender.Valid {
-		response["geneder"] = user.Gender.String
+		response["gender"] = user.Gender.String
 	}
 
 	c.JSON(200, response)
