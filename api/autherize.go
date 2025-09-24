@@ -88,6 +88,19 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 			return
 		}
 
+		client, err := server.store.GetClientByID(c.Request.Context(), clientID)
+		if err != nil {
+			redirectWithError := req.RedirectUri + "?error=invalid_client&error_description=The+client+does+not+exist&state=" + req.State
+			c.Redirect(http.StatusFound, redirectWithError)
+			return
+		}
+
+		if client.RedirectUris == nil || !help.StringInSlice(req.RedirectUri, client.RedirectUris) {
+			redirectWithError := req.RedirectUri + "?error=invalid_request&error_description=The+redirect+URI+is+not+valid&state=" + req.State
+			c.Redirect(http.StatusFound, redirectWithError)
+			return
+		}
+
 		permission, err := server.store.GetPermissionByUserAndClient(c.Request.Context(), db.GetPermissionByUserAndClientParams{
 			UserID:   userIDInt64,
 			ClientID: clientID,
