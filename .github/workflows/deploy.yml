@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Clean up Docker disk space
+      run: |
+          docker system prune -af
+          docker volume prune -f
+          
     - name: Checkout repo
       uses: actions/checkout@v4
 
