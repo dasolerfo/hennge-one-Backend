@@ -13,9 +13,17 @@ jobs:
     steps:
     - name: Clean up Docker disk space
       run: |
-          docker system prune -af
-          docker volume prune -f
-          
+        echo "🧹 Cleaning up old Docker containers, images, and volumes..."
+        # Stop and remove all stopped containers
+        docker container prune -f
+        # Remove all unused images (dangling and unreferenced)
+        docker image prune -a -f
+        # Remove all unused networks
+        docker network prune -f
+        # Remove all unused volumes
+        docker volume prune -f
+        echo "✅ Docker cleanup completed."
+
     - name: Checkout repo
       uses: actions/checkout@v4
 
