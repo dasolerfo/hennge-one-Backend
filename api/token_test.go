@@ -63,8 +63,8 @@ func TestTokenPostHandler_TableDriven(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
-				require.Contains(t, recorder.Body.String(), "idtoken")
-				require.Contains(t, recorder.Body.String(), "accesstoken")
+				require.Contains(t, recorder.Body.String(), "id_token")
+				require.Contains(t, recorder.Body.String(), "access_token")
 			},
 		},
 		{
@@ -87,7 +87,7 @@ func TestTokenPostHandler_TableDriven(t *testing.T) {
 			buildStubs: func(store *mockdb.MockStore, tokenMaker *token.JWTMaker) {
 				usedCode := authCode
 				usedCode.Used = true
-				store.EXPECT().GetAuthCode(gomock.Any(), "usedcode").Times(1).Return(&usedCode, nil)
+				store.EXPECT().GetAuthCode(gomock.Any(), "usedcode").Times(1).Return(usedCode, nil)
 			},
 			form: url.Values{
 				"grant_type":    {"authorization_code"},
@@ -106,7 +106,7 @@ func TestTokenPostHandler_TableDriven(t *testing.T) {
 			buildStubs: func(store *mockdb.MockStore, tokenMaker *token.JWTMaker) {
 				mismatchCode := authCode
 				mismatchCode.ClientID = 999
-				store.EXPECT().GetAuthCode(gomock.Any(), "code").Times(1).Return(&mismatchCode, nil)
+				store.EXPECT().GetAuthCode(gomock.Any(), "code").Times(1).Return(mismatchCode, nil)
 			},
 			form: url.Values{
 				"grant_type":    {"authorization_code"},
