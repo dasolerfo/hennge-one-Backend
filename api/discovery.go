@@ -35,11 +35,11 @@ func (server *Server) DiscoveryGetHandler(c *gin.Context) {
 		Claims: []string{"sub", "name", "email", "email_verified", "gender"},
 	}
 	c.JSON(200, response)
-	return
+
 }
 
 // JwksGetHandler serves the JSON Web Key Set (JWKS) at the /.well-known/jwks.json endpoint
 func (server *Server) JwksGetHandler(c *gin.Context) {
 	c.JSON(200, server.tokenMaker.Jwks())
-	return
+
 }

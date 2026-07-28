@@ -57,5 +57,5 @@ func (server *Server) UserinfoGetHandler(c *gin.Context) {
 	}
 
 	c.JSON(200, response)
-	return
+
 }

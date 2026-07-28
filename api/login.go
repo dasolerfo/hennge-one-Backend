@@ -66,7 +66,7 @@ func (server *Server) LoginPostHandler(c *gin.Context) {
 	session.Save()
 
 	c.Redirect(302, "/authorize?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
-	return
+
 }
 
 func (server *Server) BuildIssuerURL() string {
@@ -129,6 +129,5 @@ func (server *Server) CreateUserHandler(c *gin.Context) {
 		"name":    user.Name,
 		"email":   user.Email,
 		"id":      user.ID})
-	return
 
 }

@@ -51,7 +51,6 @@ func (server *Server) RegisterClientHandler(c *gin.Context) {
 			"client_name": client.ClientName,
 		},
 	})
-	return
 }
 
 type ClientsGetHandlerResponse struct {
@@ -85,5 +84,5 @@ func (server *Server) ClientsGetHandler(c *gin.Context) {
 		"client_secret": client.ClientSecret,
 		"redirect_uris": client.RedirectUris,
 	})
-	return
+
 }

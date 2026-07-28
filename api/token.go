@@ -128,6 +128,5 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 	}
 
 	c.JSON(200, response)
-	return
 
 }

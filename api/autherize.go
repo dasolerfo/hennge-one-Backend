@@ -51,16 +51,12 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	userID := session.Get(SessionCodeKey)
 	state := session.Get(StateCode)
 
-	if req.Prompt == "login" && state != nil {
-		if state.(string) != req.State {
+	if req.Prompt == "login" {
+		sessionState, _ := state.(string)
+		if sessionState != req.State {
 			c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=falloAqui")
 			return
 		}
-	}
-
-	if state.(string) != req.State {
-		c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=falloAqui")
-		return
 	}
 
 	if userID != nil {
@@ -124,7 +120,7 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 		// Everything is correct, return to the redirect URI with the code
 		ReturnToRedirectURI(*server, req, userID, c)
 
-		c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=TornoAqui")
+		//c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=TornoAqui")
 		return
 
 	}
@@ -142,8 +138,6 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	}
 
 	c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=PetoPerValidesa")
-
-	return
 }
 
 func ReturnToRedirectURI(server Server, req AuthorizeGetHandlerRequest, userID interface{}, c *gin.Context) {
@@ -177,10 +171,8 @@ func ReturnToRedirectURI(server Server, req AuthorizeGetHandlerRequest, userID i
 		return
 	}
 
-	//if authCode  {
 	c.Redirect(http.StatusFound, authCode.RedirectUri+"?code="+authCode.Code+"&state="+req.State)
-	return
-	//}
+
 }
 
 type InitiateLoginHandlerRequest struct {
@@ -240,7 +232,6 @@ func (server *Server) InitiateLoginHandler(c *gin.Context) {
 
 	c.Redirect(302, "/authorize?issuer="+result.Issuer+"&scope=openid&response_type=code&redirect_uri="+req.TargetLinkUri+"&state=initiate_login&client_id=hennge-one-client&prompt=login")
 
-	return
 	/*if req.Issuer != server.BuildIssuerURL() {
 		c.JSON(400, gin.H{
 			"error":             "invalid_request",
