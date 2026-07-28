@@ -15,6 +15,7 @@ import (
 	db "github.com/dasolerfo/hennge-one-Backend.git/db/model"
 	"github.com/dasolerfo/hennge-one-Backend.git/help"
 	"github.com/dasolerfo/hennge-one-Backend.git/token"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -52,7 +53,7 @@ func TestUserInfo(t *testing.T) {
 		{
 			name: "OK",
 			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
-				token, payload, err := server.tokenMaker.CreateToken(user.Email, time.Minute)
+				token, payload, err := server.tokenMaker.CreateToken(user.Sub.String(), user.Email, time.Minute)
 				require.NoError(t, err)
 				require.NotEmpty(t, token)
 				require.NotEmpty(t, payload)
@@ -78,7 +79,7 @@ func TestUserInfo(t *testing.T) {
 		{
 			name: "Unathorized - No Token",
 			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
-				token, payload, err := server.tokenMaker.CreateToken(user.Email, time.Minute)
+				token, payload, err := server.tokenMaker.CreateToken(user.Sub.String(), user.Email, time.Minute)
 				require.NoError(t, err)
 				require.NotEmpty(t, token)
 				require.NotEmpty(t, payload)
@@ -104,7 +105,7 @@ func TestUserInfo(t *testing.T) {
 		{
 			name: "Invalid Token",
 			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
-				token, payload, err := server.tokenMaker.CreateToken(user.Email, time.Minute)
+				token, payload, err := server.tokenMaker.CreateToken(user.Sub.String(), user.Email, time.Minute)
 				require.NoError(t, err)
 				require.NotEmpty(t, token)
 				require.NotEmpty(t, payload)
@@ -130,7 +131,7 @@ func TestUserInfo(t *testing.T) {
 		{
 			name: "Unathorized - Unknown User",
 			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
-				token, payload, err := server.tokenMaker.CreateToken("noexisteixo@gmail.com", time.Minute)
+				token, payload, err := server.tokenMaker.CreateToken("999999", "noexisteixo@gmail.com", time.Minute)
 				require.NoError(t, err)
 				require.NotEmpty(t, token)
 				require.NotEmpty(t, payload)
@@ -156,7 +157,7 @@ func TestUserInfo(t *testing.T) {
 		{
 			name: "Unathorized - Caducated Token",
 			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
-				token, payload, err := server.tokenMaker.CreateToken(user.Email, -time.Minute)
+				token, payload, err := server.tokenMaker.CreateToken(user.Sub.String(), user.Email, -time.Minute)
 				require.NoError(t, err)
 				require.NotEmpty(t, token)
 				require.NotEmpty(t, payload)
@@ -236,6 +237,7 @@ func randomUser(t *testing.T) db.User {
 
 	return db.User{
 		ID:             help.RandomInt(1, 1000),
+		Sub:            uuid.New(),
 		Name:           help.RandomString(9),
 		Email:          help.RandomEmail(),
 		EmailVerified:  true,

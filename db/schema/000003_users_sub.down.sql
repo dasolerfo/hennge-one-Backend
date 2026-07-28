@@ -1,0 +1,2 @@
+ALTER TABLE "users" DROP CONSTRAINT IF EXISTS "users_sub_key";
+ALTER TABLE "users" DROP COLUMN IF EXISTS "sub";

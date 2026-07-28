@@ -14,6 +14,7 @@ import (
 	reflect "reflect"
 
 	db "github.com/dasolerfo/hennge-one-Backend.git/db/model"
+	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -189,6 +190,21 @@ func (m *MockStore) GetUserByID(ctx context.Context, id int64) (db.User, error) 
 func (mr *MockStoreMockRecorder) GetUserByID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockStore)(nil).GetUserByID), ctx, id)
+}
+
+// GetUserBySub mocks base method.
+func (m *MockStore) GetUserBySub(ctx context.Context, sub uuid.UUID) (db.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserBySub", ctx, sub)
+	ret0, _ := ret[0].(db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserBySub indicates an expected call of GetUserBySub.
+func (mr *MockStoreMockRecorder) GetUserBySub(ctx, sub any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserBySub", reflect.TypeOf((*MockStore)(nil).GetUserBySub), ctx, sub)
 }
 
 // ListClients mocks base method.

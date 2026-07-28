@@ -33,7 +33,7 @@ func TestTokenPostHandler_TableDriven(t *testing.T) {
 		ClientID:    client.ID,
 		RedirectUri: "http://localhost/cb",
 		Scope:       sql.NullString{String: "openid", Valid: true},
-		Sub:         fmt.Sprintf("%d", user.ID),
+		Sub:         user.Sub.String(),
 		CreatedAt:   time.Now(),
 	}
 	//payload := &token.Payload{ExpiredAt: 3600}
@@ -50,7 +50,7 @@ func TestTokenPostHandler_TableDriven(t *testing.T) {
 				store.EXPECT().GetAuthCode(gomock.Any(), "validcode").Times(1).Return(authCode, nil)
 				store.EXPECT().GetClientByID(gomock.Any(), client.ID).Times(1).Return(client, nil)
 				store.EXPECT().SetCodeUsed(gomock.Any(), "validcode").Times(1).Return(nil)
-				store.EXPECT().GetUserByID(gomock.Any(), user.ID).Times(1).Return(user, nil)
+				store.EXPECT().GetUserBySub(gomock.Any(), user.Sub).Times(1).Return(user, nil)
 				//tokenMaker.CreateIDToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(1).Return("idtoken", payload, nil)
 				//tokenMaker.CreateToken(user.Email, gomock.Any()).Times(1).Return("accesstoken", payload, nil)
 			},
@@ -222,7 +222,7 @@ func TestTokenPostHandler_TableDriven(t *testing.T) {
 				store.EXPECT().GetAuthCode(gomock.Any(), "validcode").Times(1).Return(&authCode, nil)
 				store.EXPECT().GetClientByID(gomock.Any(), client.ID).Times(1).Return(&client, nil)
 				store.EXPECT().SetCodeUsed(gomock.Any(), "validcode").Times(1).Return(errors.New("db error"))
-				store.EXPECT().GetUserByID(gomock.Any(), user.ID).Times(1).Return(&user, nil)
+				store.EXPECT().GetUserBySub(gomock.Any(), user.Sub).Times(1).Return(&user, nil)
 				//tokenMaker.EXPECT().CreateIDToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(1).Return("idtoken", payload, nil)
 				//tokenMaker.EXPECT().CreateToken(user.Email, gomock.Any()).Times(1).Return("accesstoken", payload, nil)
 			},
@@ -239,12 +239,12 @@ func TestTokenPostHandler_TableDriven(t *testing.T) {
 			},
 		},
 		{
-			name: "GetUserByIDError",
+			name: "GetUserBySubError",
 			buildStubs: func(store *mockdb.MockStore, tokenMaker *token.JWTMaker) {
 				store.EXPECT().GetAuthCode(gomock.Any(), "validcode").Times(1).Return(&authCode, nil)
 				store.EXPECT().GetClientByID(gomock.Any(), client.ID).Times(1).Return(&client, nil)
 				store.EXPECT().SetCodeUsed(gomock.Any(), "validcode").Times(1).Return(nil)
-				store.EXPECT().GetUserByID(gomock.Any(), user.ID).Times(1).Return(nil, errors.New("not found"))
+				store.EXPECT().GetUserBySub(gomock.Any(), user.Sub).Times(1).Return(nil, errors.New("not found"))
 				//tokenMaker.EXPECT().CreateIDToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(1).Return("idtoken", payload, nil)
 				//tokenMaker.EXPECT().CreateToken(gomock.Any(), gomock.Any()).Times(1).Return("accesstoken", payload, nil)
 			},

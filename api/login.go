@@ -2,7 +2,6 @@ package api
 
 import (
 	"database/sql"
-	"strconv"
 
 	db "github.com/dasolerfo/hennge-one-Backend.git/db/model"
 	"github.com/dasolerfo/hennge-one-Backend.git/help"
@@ -57,10 +56,10 @@ func (server *Server) LoginPostHandler(c *gin.Context) {
 		return
 	}
 
-	id := strconv.FormatInt(user.ID, 10)
+	sub := user.Sub.String()
 
 	session := sessions.Default(c)
-	session.Set(SessionCodeKey, id)
+	session.Set(SessionCodeKey, sub)
 	//session.Set(ValidUntil, time.Now().Add(10*time.Minute).Format(time.RFC3339))
 	session.Set(StateCode, req.State)
 	session.Save()
@@ -71,7 +70,7 @@ func (server *Server) LoginPostHandler(c *gin.Context) {
 
 func (server *Server) BuildIssuerURL() string {
 	if server.Config.RunMode == "local" {
-		return "http://localhost:8080"
+		return "https://localhost:8443"
 	} else {
 		return "https://" + server.Config.Issuer
 	}

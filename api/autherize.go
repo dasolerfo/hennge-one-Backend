@@ -11,6 +11,7 @@ import (
 	"github.com/dasolerfo/hennge-one-Backend.git/help"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 const authType = "Bearer"
@@ -60,13 +61,13 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	}
 
 	if userID != nil {
-		userIDInt64, err := strconv.ParseInt(userID.(string), 10, 64)
+		userSub, err := uuid.Parse(userID.(string))
 		if err != nil {
 			redirectWithError := req.RedirectUri + "?error=invalid_client&error_description=The+user+ID+is+invalid&state=" + req.State
 			c.Redirect(http.StatusFound, redirectWithError)
 			return
 		}
-		_, err = server.store.GetUserByID(c.Request.Context(), userIDInt64)
+		user, err := server.store.GetUserBySub(c.Request.Context(), userSub)
 
 		if err != nil && err == sql.ErrNoRows {
 			c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=NopeFalloAqui")
@@ -98,7 +99,7 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 		}
 
 		permission, err := server.store.GetPermissionByUserAndClient(c.Request.Context(), db.GetPermissionByUserAndClientParams{
-			UserID:   userIDInt64,
+			UserID:   user.ID,
 			ClientID: clientID,
 		})
 

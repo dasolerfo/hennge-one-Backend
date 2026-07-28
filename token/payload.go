@@ -2,11 +2,8 @@ package token
 
 import (
 	"errors"
-	"strconv"
-
 	"time"
 
-	"github.com/dasolerfo/hennge-one-Backend.git/help"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
@@ -77,7 +74,7 @@ func (p *Payload) GetSubject() (string, error) {
 
 // NewPayload creates a new Payload with a unique ID, email, issued time, and expiration time.
 // It returns an error if the UUID generation fails.
-func NewPayload(email string, duration time.Duration) (*AccessTokenPayload, error) {
+func NewPayload(userID string, email string, duration time.Duration) (*AccessTokenPayload, error) {
 	id, err := uuid.NewUUID()
 	if err != nil {
 		return nil, err
@@ -89,7 +86,7 @@ func NewPayload(email string, duration time.Duration) (*AccessTokenPayload, erro
 
 		Payload: Payload{
 			Issuer:    "hennge-one",
-			Subject:   strconv.Itoa(int(help.RandomInt(100000, 999999))),
+			Subject:   userID,
 			IssuedAt:  int64(time.Now().UTC().Unix()),
 			ExpiredAt: int64(time.Now().UTC().Add(duration).Unix())},
 	}

@@ -3,8 +3,8 @@ package token
 import "time"
 
 type Maker interface {
-	// CreateToken creates a new token for the given email and duration.
-	CreateToken(email string, duration time.Duration) (string, *AccessTokenPayload, error)
+	// CreateToken creates a new token for the given user ID, email and duration.
+	CreateToken(userID string, email string, duration time.Duration) (string, *AccessTokenPayload, error)
 	// VerifyToken checks if the token is valid and returns the email if it is.
 	VerifyToken(token string) (*Payload, error)
 	// VerifyIDToken checks if the IDToken is valid and returns the email if it is.

@@ -44,7 +44,7 @@ func (server *Server) UserinfoGetHandler(c *gin.Context) {
 	}
 
 	response := gin.H{
-		"sub":    payload.ID.String(),
+		"sub":    payload.Subject,
 		"name":   user.Name,
 		"email":  user.Email,
 		"gender": "",

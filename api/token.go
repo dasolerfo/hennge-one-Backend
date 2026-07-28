@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func TokenGetHandler(c *gin.Context) {
@@ -107,9 +108,15 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 	stringClientID := strconv.FormatInt(req.ClientID, 10)
 
 	idtoken, payload, err := server.tokenMaker.CreateIDToken(server.Config.Issuer, authCode.Sub, []string{stringClientID}, authCode.CreatedAt.Unix(), server.Config.TokenDuration)
-	userId, err := strconv.ParseInt(authCode.Sub, 10, 64)
-	//TODO: millorar això
-	user, err := server.store.GetUserByID(c.Request.Context(), userId)
+	userSub, err := uuid.Parse(authCode.Sub)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error":             "server_error",
+			"error_description": "Internal server error",
+		})
+		return
+	}
+	user, err := server.store.GetUserBySub(c.Request.Context(), userSub)
 
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -118,7 +125,7 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 		})
 		return
 	}
-	accessToken, _, err := server.tokenMaker.CreateToken(user.Email, server.Config.TokenDuration)
+	accessToken, _, err := server.tokenMaker.CreateToken(authCode.Sub, user.Email, server.Config.TokenDuration)
 
 	response := &TokenPostHandlerResponse{
 		IdToken:     idtoken,
