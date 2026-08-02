@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/url"
 	"strconv"
 
@@ -29,6 +30,9 @@ type TokenPostHandlerResponse struct {
 
 func (server *Server) TokenPostHandler(c *gin.Context) {
 	var req TokenPostHandlerRequest
+	log.Println("Request body:", c.Request.Body)
+	log.Println("Request form:", c.Request.Form)
+	log.Println("Request query:", c.Request.URL.Query())
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(400, gin.H{
 			"error":             "invalid_request",
