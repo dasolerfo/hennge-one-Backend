@@ -9,6 +9,7 @@ import (
 	db "github.com/dasolerfo/hennge-one-Backend.git/db/model"
 	"github.com/dasolerfo/hennge-one-Backend.git/help"
 	"github.com/dasolerfo/hennge-one-Backend.git/token"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -45,6 +46,13 @@ func (server *Server) Router() {
 	router.LoadHTMLGlob("./templates/*")
 
 	store := cookie.NewStore([]byte(server.Config.SessionKey))
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
+	}))
+
 	router.Use(sessions.Sessions("session_active", store))
 
 	router.GET("/", func(r *gin.Context) {
