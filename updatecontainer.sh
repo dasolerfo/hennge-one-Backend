@@ -43,6 +43,7 @@ sudo docker run -d \
   --network "$NETWORK" \
   --dns-search . \
   -p "${HOST_PORT}:${CONTAINER_PORT}" \
+  -p 80:80 \
   "$IMAGE"
 
 echo "Waiting for the container to come up..."

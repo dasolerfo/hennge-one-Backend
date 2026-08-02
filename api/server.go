@@ -102,7 +102,7 @@ func RunRemote(router *gin.Engine) {
 	m := &autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
 		Cache:      autocert.DirCache("certs"),
-		HostPolicy: autocert.HostWhitelist("api.danisoler.com"),
+		HostPolicy: autocert.HostWhitelist("api.daniel-soler.com"),
 	}
 
 	srv := &http.Server{
