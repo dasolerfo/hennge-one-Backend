@@ -23,6 +23,8 @@ type Config struct {
 	JwksEndpoint     string `mapstructure:"JWKS_ENDPOINT"`
 	UserinfoEndpoint string `mapstructure:"USERINFO_ENDPOINT"`
 	SymmetricKeyBits int    `mapstructure:"SYMMETRIC_KEY_BITS"`
+	// For the server
+	Port string `mapstructure:"PORT"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

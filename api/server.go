@@ -78,8 +78,9 @@ func (server *Server) Router() {
 func (server *Server) Start() {
 	if server.Config.RunMode == "local" {
 		RunLocal(server.router)
+	} else if server.Config.RunMode == "prod" {
+		RunRemote(server.router)
 	} else {
-		//RunRemote(server.router)
 		RunEC2(server.router)
 	}
 }
@@ -100,8 +101,8 @@ func RunLocal(router *gin.Engine) {
 func RunRemote(router *gin.Engine) {
 	m := &autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
-		Cache:      autocert.DirCache("certs"), // carpeta on guarda els certificats
-		HostPolicy: autocert.HostWhitelist("idp.danisoler.com"),
+		Cache:      autocert.DirCache("certs"),
+		HostPolicy: autocert.HostWhitelist("api.danisoler.com"),
 	}
 
 	srv := &http.Server{
