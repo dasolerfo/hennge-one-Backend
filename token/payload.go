@@ -30,6 +30,7 @@ type IDTokenPayload struct {
 	Payload
 	AuthTime int64    `json:"auth_time"`
 	Audience []string `json:"aud"`
+	Nonce    string   `json:"nonce,omitempty"`
 }
 
 // GetExpirationTime implements jwt.Claims.
@@ -94,7 +95,7 @@ func NewPayload(userID string, email string, duration time.Duration) (*AccessTok
 	return payload, nil
 }
 
-func NewIDTokenPayLoad(issuer string, subject string, audience []string, auth_time int64, duration time.Duration) (*IDTokenPayload, error) {
+func NewIDTokenPayLoad(issuer string, subject string, audience []string, auth_time int64, duration time.Duration, nonce string) (*IDTokenPayload, error) {
 
 	payload := &IDTokenPayload{
 		Payload: Payload{
@@ -105,6 +106,7 @@ func NewIDTokenPayLoad(issuer string, subject string, audience []string, auth_ti
 		},
 		AuthTime: int64(time.Now().UTC().Unix()),
 		Audience: audience,
+		Nonce:    nonce,
 	}
 	return payload, nil
 }

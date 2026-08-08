@@ -113,7 +113,7 @@ func TestJWTIDToken(t *testing.T) {
 	issuedAt := time.Now()
 	expiredAt := issuedAt.Add(duration)
 
-	token, payload, err := maker.CreateIDToken(issuer, subject, audience, issuedAt.Unix(), duration)
+	token, payload, err := maker.CreateIDToken(issuer, subject, audience, issuedAt.Unix(), duration, "test_nonce")
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
 	require.NotEmpty(t, payload)
