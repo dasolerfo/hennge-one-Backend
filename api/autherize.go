@@ -37,11 +37,11 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 		return
 	}
 
-	if req.Scope != "openid" {
+	/* if req.Scope != "openid" {
 		redirectWithError := req.RedirectUri + "?error=invalid_scope&error_description=Authentification+type+not+supported+pringat&state=" + req.State
 		c.Redirect(http.StatusFound, redirectWithError)
 		return
-	}
+	}*/
 	if req.ResponseType != "code" {
 		redirectWithError := req.RedirectUri + "?error=unsupported_response_type&error_description=Response+type+not+supported+pringat&state=" + req.State
 		c.Redirect(http.StatusFound, redirectWithError)
