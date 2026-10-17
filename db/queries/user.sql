@@ -8,3 +8,5 @@ SELECT * FROM users WHERE sub = $1;
 INSERT INTO users (name, hashed_password, email, gender, email_verified)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
+-- name: GetAllUsers :many
+SELECT * FROM users;

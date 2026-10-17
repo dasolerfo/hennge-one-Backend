@@ -15,6 +15,7 @@ type Querier interface {
 	CreateClient(ctx context.Context, arg CreateClientParams) (Client, error)
 	CreatePermission(ctx context.Context, arg CreatePermissionParams) (Permission, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	GetAllUsers(ctx context.Context) ([]User, error)
 	GetAuthCode(ctx context.Context, code string) (AuthCode, error)
 	GetClientByID(ctx context.Context, id int64) (Client, error)
 	GetClientBysource(ctx context.Context, clientSource string) (Client, error)

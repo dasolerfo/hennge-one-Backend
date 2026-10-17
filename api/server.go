@@ -59,20 +59,20 @@ func (server *Server) Router() {
 		r.JSON(200, gin.H{"hello": "Si reps això desde el Postmant, funciona!"})
 	})
 
+	// API endpoints
 	router.POST("/create_user", server.CreateUserHandler)
-	router.GET("/authorize", server.AuthorizeGetHandler)
-
-	// OAuth2 endpointss
-	router.POST("/token", server.TokenPostHandler)
-	router.GET("/login", server.DisplayLoginPage)
-	router.POST("/login", server.LoginPostHandler)
-
+	router.GET("/users", server.GetAllUsersHandler)
 	router.POST("/register_client", server.RegisterClientHandler)
 	router.GET("/clients", server.ClientsGetHandler)
 	router.POST("/permissions", server.PermissionPostHandler)
 
-	// OIDC endpoints
+	// OAuth2 endpointss
+	router.POST("/token", server.TokenPostHandler)
+	router.GET("/authorize", server.AuthorizeGetHandler)
+	router.GET("/login", server.DisplayLoginPage)
+	router.POST("/login", server.LoginPostHandler)
 
+	// OIDC endpoints
 	router.GET("/.well-known/openid-configuration", server.DiscoveryGetHandler)
 	router.GET("/initiate_login_uri", server.InitiateLoginHandler)
 	router.GET("/.well-known/jwks.json", server.JwksGetHandler)

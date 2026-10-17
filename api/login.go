@@ -130,3 +130,18 @@ func (server *Server) CreateUserHandler(c *gin.Context) {
 		"id":      user.ID})
 
 }
+
+func (server *Server) GetAllUsersHandler(c *gin.Context) {
+	users, err := server.store.GetAllUsers(c.Request.Context())
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error":             "server_error",
+			"error_description": "Failed to retrieve users",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"users": users,
+	})
+}
