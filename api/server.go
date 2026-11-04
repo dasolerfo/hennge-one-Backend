@@ -64,6 +64,7 @@ func (server *Server) Router() {
 	router.GET("/users", server.GetAllUsersHandler)
 	router.POST("/register_client", server.RegisterClientHandler)
 	router.GET("/clients", server.ClientsGetHandler)
+	router.GET("/all_clients", server.GetAllClientsHandler)
 
 	// OAuth2 endpointss
 	router.POST("/token", server.TokenPostHandler)

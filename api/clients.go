@@ -86,3 +86,18 @@ func (server *Server) ClientsGetHandler(c *gin.Context) {
 	})
 
 }
+
+func (server *Server) GetAllClientsHandler(c *gin.Context) {
+	clients, err := server.store.ListClients(c.Request.Context())
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error":             "server_error",
+			"error_description": "Failed to retrieve clients",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"clients": clients,
+	})
+}
