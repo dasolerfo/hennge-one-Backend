@@ -73,7 +73,6 @@ func (server *Server) RouterTest() {
 
 	router.POST("/register_client", server.RegisterClientHandler)
 	router.GET("/clients", server.ClientsGetHandler)
-	router.POST("/permissions", server.PermissionPostHandler)
 
 	// OIDC endpoints
 

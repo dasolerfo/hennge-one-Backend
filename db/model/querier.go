@@ -13,19 +13,16 @@ import (
 type Querier interface {
 	CreateAuthCode(ctx context.Context, arg CreateAuthCodeParams) (AuthCode, error)
 	CreateClient(ctx context.Context, arg CreateClientParams) (Client, error)
-	CreatePermission(ctx context.Context, arg CreatePermissionParams) (Permission, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetAllUsers(ctx context.Context) ([]User, error)
 	GetAuthCode(ctx context.Context, code string) (AuthCode, error)
 	GetClientByID(ctx context.Context, id int64) (Client, error)
 	GetClientBysource(ctx context.Context, clientSource string) (Client, error)
-	GetPermissionByUserAndClient(ctx context.Context, arg GetPermissionByUserAndClientParams) (Permission, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id int64) (User, error)
 	GetUserBySub(ctx context.Context, sub uuid.UUID) (User, error)
 	ListClients(ctx context.Context) ([]Client, error)
 	SetCodeUsed(ctx context.Context, code string) error
-	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) (Permission, error)
 }
 
 var _ Querier = (*Queries)(nil)
