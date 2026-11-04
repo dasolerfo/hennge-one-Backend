@@ -35,8 +35,8 @@ func NewJWTMaker(bits int) (*JWTMaker, error) {
 }
 
 // CreateToken creates a new JWT token for the given user ID, email and duration.
-func (maker *JWTMaker) CreateToken(userID string, email string, duration time.Duration) (string, *AccessTokenPayload, error) {
-	payload, err := NewPayload(userID, email, duration)
+func (maker *JWTMaker) CreateToken(issuer string, userID string, email string, duration time.Duration) (string, *AccessTokenPayload, error) {
+	payload, err := NewPayload(issuer, userID, email, duration)
 	if err != nil {
 		return "", payload, err
 	}

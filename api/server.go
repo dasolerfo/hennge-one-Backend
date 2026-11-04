@@ -61,10 +61,13 @@ func (server *Server) Router() {
 
 	// API endpoints
 	router.POST("/create_user", server.CreateUserHandler)
-	router.GET("/users", server.GetAllUsersHandler)
 	router.POST("/register_client", server.RegisterClientHandler)
-	router.GET("/clients", server.ClientsGetHandler)
-	router.GET("/all_clients", server.GetAllClientsHandler)
+
+	// Protected API endpoints (require a valid access token from this IdP)
+	authRoutes := router.Group("/").Use(server.AuthMiddleware())
+	authRoutes.GET("/users", server.GetAllUsersHandler)
+	authRoutes.GET("/clients", server.ClientsGetHandler)
+	authRoutes.GET("/all_clients", server.GetAllClientsHandler)
 
 	// OAuth2 endpointss
 	router.POST("/token", server.TokenPostHandler)

@@ -75,7 +75,7 @@ func (p *Payload) GetSubject() (string, error) {
 
 // NewPayload creates a new Payload with a unique ID, email, issued time, and expiration time.
 // It returns an error if the UUID generation fails.
-func NewPayload(userID string, email string, duration time.Duration) (*AccessTokenPayload, error) {
+func NewPayload(issuer string, userID string, email string, duration time.Duration) (*AccessTokenPayload, error) {
 	id, err := uuid.NewUUID()
 	if err != nil {
 		return nil, err
@@ -86,7 +86,7 @@ func NewPayload(userID string, email string, duration time.Duration) (*AccessTok
 		Email: email,
 
 		Payload: Payload{
-			Issuer:    "hennge-one",
+			Issuer:    issuer,
 			Subject:   userID,
 			IssuedAt:  int64(time.Now().UTC().Unix()),
 			ExpiredAt: int64(time.Now().UTC().Add(duration).Unix())},

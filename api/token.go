@@ -129,7 +129,7 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 		})
 		return
 	}
-	accessToken, _, err := server.tokenMaker.CreateToken(authCode.Sub, user.Email, server.Config.TokenDuration)
+	accessToken, _, err := server.tokenMaker.CreateToken(server.Config.Issuer, authCode.Sub, user.Email, server.Config.TokenDuration)
 
 	response := &TokenPostHandlerResponse{
 		IdToken:     idtoken,

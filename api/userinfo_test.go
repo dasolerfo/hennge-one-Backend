@@ -53,7 +53,7 @@ func TestUserInfo(t *testing.T) {
 		{
 			name: "OK",
 			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
-				token, payload, err := server.tokenMaker.CreateToken(user.Sub.String(), user.Email, time.Minute)
+				token, payload, err := server.tokenMaker.CreateToken(server.Config.Issuer, user.Sub.String(), user.Email, time.Minute)
 				require.NoError(t, err)
 				require.NotEmpty(t, token)
 				require.NotEmpty(t, payload)
@@ -79,7 +79,7 @@ func TestUserInfo(t *testing.T) {
 		{
 			name: "Unathorized - No Token",
 			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
-				token, payload, err := server.tokenMaker.CreateToken(user.Sub.String(), user.Email, time.Minute)
+				token, payload, err := server.tokenMaker.CreateToken(server.Config.Issuer, user.Sub.String(), user.Email, time.Minute)
 				require.NoError(t, err)
 				require.NotEmpty(t, token)
 				require.NotEmpty(t, payload)
@@ -105,7 +105,7 @@ func TestUserInfo(t *testing.T) {
 		{
 			name: "Invalid Token",
 			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
-				token, payload, err := server.tokenMaker.CreateToken(user.Sub.String(), user.Email, time.Minute)
+				token, payload, err := server.tokenMaker.CreateToken(server.Config.Issuer, user.Sub.String(), user.Email, time.Minute)
 				require.NoError(t, err)
 				require.NotEmpty(t, token)
 				require.NotEmpty(t, payload)
@@ -131,7 +131,7 @@ func TestUserInfo(t *testing.T) {
 		{
 			name: "Unathorized - Unknown User",
 			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
-				token, payload, err := server.tokenMaker.CreateToken("999999", "noexisteixo@gmail.com", time.Minute)
+				token, payload, err := server.tokenMaker.CreateToken(server.Config.Issuer, "999999", "noexisteixo@gmail.com", time.Minute)
 				require.NoError(t, err)
 				require.NotEmpty(t, token)
 				require.NotEmpty(t, payload)
@@ -157,7 +157,7 @@ func TestUserInfo(t *testing.T) {
 		{
 			name: "Unathorized - Caducated Token",
 			createAuth: func(tokenMaker token.Maker, request *http.Request, server Server) {
-				token, payload, err := server.tokenMaker.CreateToken(user.Sub.String(), user.Email, -time.Minute)
+				token, payload, err := server.tokenMaker.CreateToken(server.Config.Issuer, user.Sub.String(), user.Email, -time.Minute)
 				require.NoError(t, err)
 				require.NotEmpty(t, token)
 				require.NotEmpty(t, payload)
