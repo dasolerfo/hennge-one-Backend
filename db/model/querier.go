@@ -14,6 +14,8 @@ type Querier interface {
 	CreateAuthCode(ctx context.Context, arg CreateAuthCodeParams) (AuthCode, error)
 	CreateClient(ctx context.Context, arg CreateClientParams) (Client, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteClient(ctx context.Context, id int64) error
+	DeleteUser(ctx context.Context, id int64) error
 	GetAllUsers(ctx context.Context) ([]User, error)
 	GetAuthCode(ctx context.Context, code string) (AuthCode, error)
 	GetClientByID(ctx context.Context, id int64) (Client, error)
@@ -23,6 +25,8 @@ type Querier interface {
 	GetUserBySub(ctx context.Context, sub uuid.UUID) (User, error)
 	ListClients(ctx context.Context) ([]Client, error)
 	SetCodeUsed(ctx context.Context, code string) error
+	UpdateClient(ctx context.Context, arg UpdateClientParams) (Client, error)
+	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 }
 
 var _ Querier = (*Queries)(nil)

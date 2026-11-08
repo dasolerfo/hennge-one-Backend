@@ -49,7 +49,7 @@ func (server *Server) Router() {
 
 	router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"*"},
-		AllowMethods: []string{"GET", "POST"},
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
 		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
 	}))
 
@@ -68,6 +68,14 @@ func (server *Server) Router() {
 	authRoutes.GET("/users", server.GetAllUsersHandler)
 	authRoutes.GET("/clients", server.ClientsGetHandler)
 	authRoutes.GET("/all_clients", server.GetAllClientsHandler)
+
+	// CRUD endpoints
+	authRoutes.GET("/users/:id", server.GetUserHandler)
+	authRoutes.PUT("/users/:id", server.UpdateUserHandler)
+	authRoutes.DELETE("/users/:id", server.DeleteUserHandler)
+	authRoutes.GET("/clients/:id", server.GetClientHandler)
+	authRoutes.PUT("/clients/:id", server.UpdateClientHandler)
+	authRoutes.DELETE("/clients/:id", server.DeleteClientHandler)
 
 	// OAuth2 endpointss
 	router.POST("/token", server.TokenPostHandler)

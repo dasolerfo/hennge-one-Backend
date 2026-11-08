@@ -103,7 +103,6 @@ func (maker *JWTMaker) VerifyIDToken(token string) (*IDTokenPayload, error) {
 	jwtToken, err := jwt.ParseWithClaims(token, &IDTokenPayload{}, funcioKey)
 
 	if err != nil {
-		// Check if the error is due to an expired token
 		if errors.Is(err, jwt.ErrTokenExpired) {
 			return nil, ExpiredTokenError
 		}

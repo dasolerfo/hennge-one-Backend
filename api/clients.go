@@ -101,3 +101,72 @@ func (server *Server) GetAllClientsHandler(c *gin.Context) {
 		"clients": clients,
 	})
 }
+
+func (server *Server) GetClientHandler(c *gin.Context) {
+	var uri idURIRequest
+	if err := c.ShouldBindUri(&uri); err != nil {
+		badRequest(c)
+		return
+	}
+
+	client, err := server.store.GetClientByID(c.Request.Context(), uri.ID)
+	if err != nil {
+		dbError(c, err, "Client does not exist", "Failed to retrieve the client")
+		return
+	}
+
+	c.JSON(200, client)
+}
+
+type UpdateClientRequest struct {
+	ClientSource *string  `json:"client_source" binding:"omitempty,min=1"`
+	ClientName   *string  `json:"client_name" binding:"omitempty,min=1"`
+	ClientSecret *string  `json:"client_secret" binding:"omitempty,min=1"`
+	RedirectUris []string `json:"redirect_uris" binding:"omitempty,min=1"`
+}
+
+func (server *Server) UpdateClientHandler(c *gin.Context) {
+	var uri idURIRequest
+	if err := c.ShouldBindUri(&uri); err != nil {
+		badRequest(c)
+		return
+	}
+	var req UpdateClientRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		badRequest(c)
+		return
+	}
+
+	client, err := server.store.UpdateClient(c.Request.Context(), db.UpdateClientParams{
+		ID:           uri.ID,
+		ClientSource: nullString(req.ClientSource),
+		ClientName:   nullString(req.ClientName),
+		ClientSecret: nullString(req.ClientSecret),
+		RedirectUris: req.RedirectUris, // nil keeps the current value
+	})
+	if err != nil {
+		dbError(c, err, "Client does not exist", "Failed to update the client")
+		return
+	}
+
+	c.JSON(200, client)
+}
+
+func (server *Server) DeleteClientHandler(c *gin.Context) {
+	var uri idURIRequest
+	if err := c.ShouldBindUri(&uri); err != nil {
+		badRequest(c)
+		return
+	}
+
+	if _, err := server.store.GetClientByID(c.Request.Context(), uri.ID); err != nil {
+		dbError(c, err, "Client does not exist", "Failed to delete the client")
+		return
+	}
+	if err := server.store.DeleteClient(c.Request.Context(), uri.ID); err != nil {
+		dbError(c, err, "Client does not exist", "Failed to delete the client")
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Client deleted successfully"})
+}

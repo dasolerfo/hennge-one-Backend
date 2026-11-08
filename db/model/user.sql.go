@@ -48,6 +48,15 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const deleteUser = `-- name: DeleteUser :exec
+DELETE FROM users WHERE id = $1
+`
+
+func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteUser, id)
+	return err
+}
+
 const getAllUsers = `-- name: GetAllUsers :many
 SELECT id, name, hashed_password, email, email_verified, gender, created_at, sub FROM users
 `
@@ -130,6 +139,49 @@ SELECT id, name, hashed_password, email, email_verified, gender, created_at, sub
 
 func (q *Queries) GetUserBySub(ctx context.Context, sub uuid.UUID) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserBySub, sub)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.HashedPassword,
+		&i.Email,
+		&i.EmailVerified,
+		&i.Gender,
+		&i.CreatedAt,
+		&i.Sub,
+	)
+	return i, err
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users SET
+  name            = COALESCE($1, name),
+  email           = COALESCE($2, email),
+  hashed_password = COALESCE($3, hashed_password),
+  gender          = COALESCE($4, gender),
+  email_verified  = COALESCE($5, email_verified)
+WHERE id = $6
+RETURNING id, name, hashed_password, email, email_verified, gender, created_at, sub
+`
+
+type UpdateUserParams struct {
+	Name           sql.NullString `json:"name"`
+	Email          sql.NullString `json:"email"`
+	HashedPassword sql.NullString `json:"hashed_password"`
+	Gender         sql.NullString `json:"gender"`
+	EmailVerified  sql.NullBool   `json:"email_verified"`
+	ID             int64          `json:"id"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUser,
+		arg.Name,
+		arg.Email,
+		arg.HashedPassword,
+		arg.Gender,
+		arg.EmailVerified,
+		arg.ID,
+	)
 	var i User
 	err := row.Scan(
 		&i.ID,

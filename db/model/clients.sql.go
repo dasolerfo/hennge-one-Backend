@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/lib/pq"
 )
@@ -41,6 +42,15 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Cli
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const deleteClient = `-- name: DeleteClient :exec
+DELETE FROM clients WHERE id = $1
+`
+
+func (q *Queries) DeleteClient(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteClient, id)
+	return err
 }
 
 const getClientByID = `-- name: GetClientByID :one
@@ -114,4 +124,42 @@ func (q *Queries) ListClients(ctx context.Context) ([]Client, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateClient = `-- name: UpdateClient :one
+UPDATE clients SET
+  client_source = COALESCE($1, client_source),
+  client_name   = COALESCE($2, client_name),
+  client_secret = COALESCE($3, client_secret),
+  redirect_uris = COALESCE($4::text[], redirect_uris)
+WHERE id = $5
+RETURNING id, client_source, client_name, client_secret, redirect_uris, created_at
+`
+
+type UpdateClientParams struct {
+	ClientSource sql.NullString `json:"client_source"`
+	ClientName   sql.NullString `json:"client_name"`
+	ClientSecret sql.NullString `json:"client_secret"`
+	RedirectUris []string       `json:"redirect_uris"`
+	ID           int64          `json:"id"`
+}
+
+func (q *Queries) UpdateClient(ctx context.Context, arg UpdateClientParams) (Client, error) {
+	row := q.db.QueryRowContext(ctx, updateClient,
+		arg.ClientSource,
+		arg.ClientName,
+		arg.ClientSecret,
+		pq.Array(arg.RedirectUris),
+		arg.ID,
+	)
+	var i Client
+	err := row.Scan(
+		&i.ID,
+		&i.ClientSource,
+		&i.ClientName,
+		&i.ClientSecret,
+		pq.Array(&i.RedirectUris),
+		&i.CreatedAt,
+	)
+	return i, err
 }

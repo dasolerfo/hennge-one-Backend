@@ -215,7 +215,12 @@ func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, user db.User) {
 
 	require.NotEmpty(t, body)
 
-	var gotUser db.User
+	// /userinfo returns OIDC claims, where gender is a plain string.
+	var gotUser struct {
+		Name   string `json:"name"`
+		Email  string `json:"email"`
+		Gender string `json:"gender"`
+	}
 	err = json.Unmarshal(data, &gotUser)
 	require.NoError(t, err)
 
@@ -225,7 +230,7 @@ func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, user db.User) {
 	//require.Equal(t, user.ID, gotUser.ID)
 	require.Equal(t, user.Name, gotUser.Name)
 	require.Equal(t, user.Email, gotUser.Email)
-	require.Equal(t, user.Gender, gotUser.Gender)
+	require.Equal(t, user.Gender.String, gotUser.Gender)
 }
 
 func randomUser(t *testing.T) db.User {

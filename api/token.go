@@ -40,6 +40,13 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 		})
 		return
 	}
+	if req.GrantType != "authorization_code" {
+		c.JSON(400, gin.H{
+			"error":             "unsupported_grant_type",
+			"error_description": "Only the authorization_code grant type is supported",
+		})
+		return
+	}
 	authCode, err := server.store.GetAuthCode(c.Request.Context(), req.Code)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -107,7 +114,7 @@ func (server *Server) TokenPostHandler(c *gin.Context) {
 			"error":             "server_error",
 			"error_description": "Internal server error",
 		})
-
+		return
 	}
 	stringClientID := strconv.FormatInt(req.ClientID, 10)
 
