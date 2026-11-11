@@ -25,6 +25,10 @@ type Config struct {
 	SymmetricKeyBits int    `mapstructure:"SYMMETRIC_KEY_BITS"`
 	// For the server
 	Port string `mapstructure:"PORT"`
+	// Dashboard client (BFF login)
+	DashboardClientID     string `mapstructure:"DASHBOARD_CLIENT_ID"`
+	DashboardClientSecret string `mapstructure:"DASHBOARD_CLIENT_SECRET"`
+	DashboardRedirectURI  string `mapstructure:"DASHBOARD_REDIRECT_URI"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

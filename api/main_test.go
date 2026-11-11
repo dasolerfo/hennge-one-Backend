@@ -68,6 +68,7 @@ func (server *Server) RouterTest() {
 
 	// OAuth2 endpointss
 	router.POST("/token", server.TokenPostHandler)
+	router.POST("/dashboard/login", server.DashboardLoginHandler)
 	router.GET("/login", server.DisplayLoginPage)
 	router.POST("/login", server.LoginPostHandler)
 

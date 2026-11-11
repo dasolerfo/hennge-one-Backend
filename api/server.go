@@ -1,7 +1,6 @@
 package api
 
 import (
-	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -79,6 +78,7 @@ func (server *Server) Router() {
 
 	// OAuth2 endpointss
 	router.POST("/token", server.TokenPostHandler)
+	router.POST("/dashboard/login", server.DashboardLoginHandler)
 	router.GET("/authorize", server.AuthorizeGetHandler)
 	router.GET("/login", server.DisplayLoginPage)
 	router.POST("/login", server.LoginPostHandler)
@@ -125,11 +125,9 @@ func RunRemote(router *gin.Engine) {
 	}
 
 	srv := &http.Server{
-		Addr:    ":443",
-		Handler: router,
-		TLSConfig: &tls.Config{
-			GetCertificate: m.GetCertificate,
-		},
+		Addr:      ":443",
+		Handler:   router,
+		TLSConfig: m.TLSConfig(),
 	}
 	// Servidor HTTP per validació Let's Encrypt
 	go func() {
