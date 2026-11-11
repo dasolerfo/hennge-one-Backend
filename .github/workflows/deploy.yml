@@ -11,18 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Clean up Docker disk space
-      run: |
-        echo "🧹 Cleaning up old Docker containers, images, and volumes..."
-        # Stop and remove all stopped containers
-        docker container prune -f
-        # Remove all unused images (dangling and unreferenced)
-        docker image prune -a -f
-        # Remove all unused networks
-        docker network prune -f
-        # Remove all unused volumes
-        docker volume prune -f
-        echo "✅ Docker cleanup completed."
 
     - name: Checkout repo
       uses: actions/checkout@v4
@@ -56,6 +44,16 @@ jobs:
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest .
           docker push -a $REGISTRY/$REPOSITORY
           
+    - name: Copy deploy script to EC2
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: 22
+        source: updatecontainer.sh
+        target: ~/myapp
+
     - name: Deploy to EC2
       uses: appleboy/ssh-action@v1
       with:

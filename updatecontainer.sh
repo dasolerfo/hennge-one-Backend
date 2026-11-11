@@ -44,6 +44,7 @@ sudo docker run -d \
   --dns-search . \
   -p "${HOST_PORT}:${CONTAINER_PORT}" \
   -p 80:80 \
+  -v "$HOME/certs:/app/certs" \
   "$IMAGE"
 
 echo "Waiting for the container to come up..."
