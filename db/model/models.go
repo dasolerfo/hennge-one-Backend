@@ -12,25 +12,30 @@ import (
 )
 
 type AuthCode struct {
-	Code          string         `json:"code"`
-	ClientID      int64          `json:"client_id"`
-	RedirectUri   string         `json:"redirect_uri"`
-	Sub           string         `json:"sub"`
-	Scope         sql.NullString `json:"scope"`
-	CodeChallenge sql.NullString `json:"code_challenge"`
-	Nonce         sql.NullString `json:"nonce"`
-	CreatedAt     time.Time      `json:"created_at"`
-	ExpiresAt     time.Time      `json:"expires_at"`
-	Used          bool           `json:"used"`
+	Code                string         `json:"code"`
+	ClientID            int64          `json:"client_id"`
+	RedirectUri         string         `json:"redirect_uri"`
+	Sub                 string         `json:"sub"`
+	Scope               sql.NullString `json:"scope"`
+	CodeChallenge       sql.NullString `json:"code_challenge"`
+	Nonce               sql.NullString `json:"nonce"`
+	CreatedAt           time.Time      `json:"created_at"`
+	ExpiresAt           time.Time      `json:"expires_at"`
+	Used                bool           `json:"used"`
+	CodeChallengeMethod sql.NullString `json:"code_challenge_method"`
 }
 
 type Client struct {
-	ID           int64     `json:"id"`
-	ClientSource string    `json:"client_source"`
-	ClientName   string    `json:"client_name"`
-	ClientSecret string    `json:"client_secret"`
-	RedirectUris []string  `json:"redirect_uris"`
-	CreatedAt    time.Time `json:"created_at"`
+	ID                      int64     `json:"id"`
+	ClientSource            string    `json:"client_source"`
+	ClientName              string    `json:"client_name"`
+	ClientSecret            string    `json:"client_secret"`
+	RedirectUris            []string  `json:"redirect_uris"`
+	CreatedAt               time.Time `json:"created_at"`
+	ClientType              string    `json:"client_type"`
+	TokenEndpointAuthMethod string    `json:"token_endpoint_auth_method"`
+	GrantTypes              []string  `json:"grant_types"`
+	RequirePkce             bool      `json:"require_pkce"`
 }
 
 type User struct {

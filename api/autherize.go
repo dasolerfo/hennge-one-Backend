@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"net/url"
+	"slices"
 	"strconv"
 	"time"
 
@@ -17,14 +19,55 @@ import (
 const authType = "Bearer"
 
 type AuthorizeGetHandlerRequest struct {
-	Scope        string `form:"scope" binding:"required"`
-	ResponseType string `form:"response_type" binding:"required"`
-	RedirectUri  string `form:"redirect_uri" binding:"required"`
-	State        string `form:"state" `
-	ClintId      string `form:"client_id" binding:"required"`
-	Prompt       string `form:"prompt"`
-	Display      string `form:"display"`
-	Nonce        string `form:"nonce"`
+	Scope               string `form:"scope" binding:"required"`
+	ResponseType        string `form:"response_type" binding:"required"`
+	RedirectUri         string `form:"redirect_uri" binding:"required"`
+	State               string `form:"state" `
+	ClintId             string `form:"client_id" binding:"required"`
+	Prompt              string `form:"prompt"`
+	Display             string `form:"display"`
+	Nonce               string `form:"nonce"`
+	CodeChallenge       string `form:"code_challenge"`
+	CodeChallengeMethod string `form:"code_challenge_method"`
+}
+
+// query rebuilds the authorization request parameters so they survive the
+// round trip through /login.
+func (req AuthorizeGetHandlerRequest) query() url.Values {
+	q := url.Values{}
+	set := func(k, v string) {
+		if v != "" {
+			q.Set(k, v)
+		}
+	}
+	set("scope", req.Scope)
+	set("response_type", req.ResponseType)
+	set("redirect_uri", req.RedirectUri)
+	set("state", req.State)
+	set("client_id", req.ClintId)
+	set("prompt", req.Prompt)
+	set("display", req.Display)
+	set("nonce", req.Nonce)
+	set("code_challenge", req.CodeChallenge)
+	set("code_challenge_method", req.CodeChallengeMethod)
+	return q
+}
+
+func redirectToLogin(c *gin.Context, req AuthorizeGetHandlerRequest, debugTag string) {
+	q := req.query()
+	q.Set("error", debugTag)
+	c.Redirect(http.StatusFound, "/login?"+q.Encode())
+}
+
+// redirectWithError sends an OAuth error back to the (already validated) redirect URI.
+func redirectWithError(c *gin.Context, req AuthorizeGetHandlerRequest, code, description string) {
+	q := url.Values{}
+	q.Set("error", code)
+	q.Set("error_description", description)
+	if req.State != "" {
+		q.Set("state", req.State)
+	}
+	c.Redirect(http.StatusFound, req.RedirectUri+"?"+q.Encode())
 }
 
 func (server *Server) AuthorizeGetHandler(c *gin.Context) {
@@ -37,14 +80,48 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 		return
 	}
 
+	// Validate the client and redirect URI first. Until the redirect URI is known
+	// to be registered we must not redirect to it (RFC 6749 §4.1.2.1).
+	clientID, err := strconv.ParseInt(req.ClintId, 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid_client", "error_description": "The client ID is invalid"})
+		return
+	}
+	client, err := server.store.GetClientByID(c.Request.Context(), clientID)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid_client", "error_description": "The client does not exist"})
+		return
+	}
+	if client.RedirectUris == nil || !help.StringInSlice(req.RedirectUri, client.RedirectUris) {
+		c.JSON(400, gin.H{"error": "invalid_request", "error_description": "The redirect URI is not valid"})
+		return
+	}
+
 	/* if req.Scope != "openid" {
 		redirectWithError := req.RedirectUri + "?error=invalid_scope&error_description=Authentification+type+not+supported+pringat&state=" + req.State
 		c.Redirect(http.StatusFound, redirectWithError)
 		return
 	}*/
 	if req.ResponseType != "code" {
-		redirectWithError := req.RedirectUri + "?error=unsupported_response_type&error_description=Response+type+not+supported+pringat&state=" + req.State
-		c.Redirect(http.StatusFound, redirectWithError)
+		redirectWithError(c, req, "unsupported_response_type", "Only the code response type is supported")
+		return
+	}
+	if !slices.Contains(client.GrantTypes, GrantTypeAuthorizationCode) {
+		redirectWithError(c, req, "unauthorized_client", "The client is not allowed to use the authorization code flow")
+		return
+	}
+
+	// PKCE
+	if req.CodeChallenge != "" {
+		if err := validateCodeChallenge(req.CodeChallenge, req.CodeChallengeMethod); err != nil {
+			redirectWithError(c, req, "invalid_request", err.Error())
+			return
+		}
+	} else if req.CodeChallengeMethod != "" {
+		redirectWithError(c, req, "invalid_request", "code_challenge_method sent without code_challenge")
+		return
+	} else if client.RequirePkce {
+		redirectWithError(c, req, "invalid_request", "This client requires PKCE (code_challenge with S256)")
 		return
 	}
 
@@ -55,7 +132,7 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	if req.Prompt == "login" {
 		sessionState, _ := state.(string)
 		if sessionState != req.State {
-			c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=falloAqui")
+			redirectToLogin(c, req, "falloAqui")
 			return
 		}
 	}
@@ -63,62 +140,35 @@ func (server *Server) AuthorizeGetHandler(c *gin.Context) {
 	if userID != nil {
 		userSub, err := uuid.Parse(userID.(string))
 		if err != nil {
-			redirectWithError := req.RedirectUri + "?error=invalid_client&error_description=The+user+ID+is+invalid&state=" + req.State
-			c.Redirect(http.StatusFound, redirectWithError)
+			redirectWithError(c, req, "invalid_request", "The user ID is invalid")
 			return
 		}
 		_, err = server.store.GetUserBySub(c.Request.Context(), userSub)
 
 		if err != nil && err == sql.ErrNoRows {
-			c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=NopeFalloAqui")
+			redirectToLogin(c, req, "NopeFalloAqui")
 			return
 		} else if err != nil {
-			redirectWithError := req.RedirectUri + "?error=server_error&error_description=Internal+server+error&state=" + req.State
-			c.Redirect(http.StatusFound, redirectWithError)
-			return
-		}
-
-		clientID, err := strconv.ParseInt(req.ClintId, 10, 64)
-		if err != nil {
-			redirectWithError := req.RedirectUri + "?error=invalid_client&error_description=The+client+ID+is+invalid&state=" + req.State
-			c.Redirect(http.StatusFound, redirectWithError)
-			return
-		}
-
-		client, err := server.store.GetClientByID(c.Request.Context(), clientID)
-		if err != nil {
-			redirectWithError := req.RedirectUri + "?error=invalid_client&error_description=The+client+does+not+exist&state=" + req.State
-			c.Redirect(http.StatusFound, redirectWithError)
-			return
-		}
-
-		if client.RedirectUris == nil || !help.StringInSlice(req.RedirectUri, client.RedirectUris) {
-			redirectWithError := req.RedirectUri + "?error=invalid_request&error_description=The+redirect+URI+is+not+valid&state=" + req.State
-			c.Redirect(http.StatusFound, redirectWithError)
+			redirectWithError(c, req, "server_error", "Internal server error")
 			return
 		}
 
 		// Everything is correct, return to the redirect URI with the code
 		ReturnToRedirectURI(*server, req, userID, c)
-
-		//c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=TornoAqui")
 		return
-
 	}
 
 	if req.Prompt == "none" {
-		redirectUri := req.RedirectUri + "?error=login_required&state=" + req.State
-		c.Redirect(http.StatusFound, redirectUri)
+		redirectWithError(c, req, "login_required", "The user is not logged in")
 		return
 	}
 
 	if req.Display == "none" {
-		redirectUri := req.RedirectUri + "?error=interaction_required&state=" + req.State
-		c.Redirect(http.StatusFound, redirectUri)
+		redirectWithError(c, req, "interaction_required", "User interaction is required")
 		return
 	}
 
-	c.Redirect(302, "/login?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt+"&error=PetoPerValidesa")
+	redirectToLogin(c, req, "PetoPerValidesa")
 }
 
 func ReturnToRedirectURI(server Server, req AuthorizeGetHandlerRequest, userID interface{}, c *gin.Context) {
@@ -131,20 +181,20 @@ func ReturnToRedirectURI(server Server, req AuthorizeGetHandlerRequest, userID i
 	clientID, err := strconv.ParseInt(req.ClintId, 10, 64)
 
 	if err != nil {
-		redirectWithError := req.RedirectUri + "?error=invalid_client&error_description=The+user+ID+is+invalid&state=" + req.State
-		c.Redirect(http.StatusFound, redirectWithError)
+		redirectWithError(c, req, "invalid_client", "The client ID is invalid")
 		return
 	}
 
 	authCode, err := server.store.CreateAuthCode(c.Request.Context(), db.CreateAuthCodeParams{
-		Code:          accessCode,
-		ClientID:      clientID,
-		RedirectUri:   req.RedirectUri,
-		Sub:           userID.(string),
-		Scope:         sql.NullString{String: req.Scope, Valid: true},
-		ExpiresAt:     time.Now().Add(server.Config.CodeExpirationTime),
-		CodeChallenge: sql.NullString{String: "RS256", Valid: true},
-		Nonce:         sql.NullString{String: req.Nonce, Valid: true},
+		Code:                accessCode,
+		ClientID:            clientID,
+		RedirectUri:         req.RedirectUri,
+		Sub:                 userID.(string),
+		Scope:               sql.NullString{String: req.Scope, Valid: true},
+		ExpiresAt:           time.Now().Add(server.Config.CodeExpirationTime),
+		CodeChallenge:       sql.NullString{String: req.CodeChallenge, Valid: req.CodeChallenge != ""},
+		CodeChallengeMethod: sql.NullString{String: req.CodeChallengeMethod, Valid: req.CodeChallenge != ""},
+		Nonce:               sql.NullString{String: req.Nonce, Valid: req.Nonce != ""},
 	})
 
 	if err != nil {
@@ -152,7 +202,12 @@ func ReturnToRedirectURI(server Server, req AuthorizeGetHandlerRequest, userID i
 		return
 	}
 
-	c.Redirect(http.StatusFound, authCode.RedirectUri+"?code="+authCode.Code+"&state="+req.State)
+	q := url.Values{}
+	q.Set("code", authCode.Code)
+	if req.State != "" {
+		q.Set("state", req.State)
+	}
+	c.Redirect(http.StatusFound, authCode.RedirectUri+"?"+q.Encode())
 
 }
 

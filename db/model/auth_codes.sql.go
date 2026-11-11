@@ -13,19 +13,20 @@ import (
 
 const createAuthCode = `-- name: CreateAuthCode :one
 INSERT INTO auth_codes (
-    code, client_id, redirect_uri, sub, scope, code_challenge, nonce, expires_at
-) VALUES ( $1, $2, $3, $4, $5, $6, $7, $8 ) RETURNING code, client_id, redirect_uri, sub, scope, code_challenge, nonce, created_at, expires_at, used
+    code, client_id, redirect_uri, sub, scope, code_challenge, code_challenge_method, nonce, expires_at
+) VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9 ) RETURNING code, client_id, redirect_uri, sub, scope, code_challenge, nonce, created_at, expires_at, used, code_challenge_method
 `
 
 type CreateAuthCodeParams struct {
-	Code          string         `json:"code"`
-	ClientID      int64          `json:"client_id"`
-	RedirectUri   string         `json:"redirect_uri"`
-	Sub           string         `json:"sub"`
-	Scope         sql.NullString `json:"scope"`
-	CodeChallenge sql.NullString `json:"code_challenge"`
-	Nonce         sql.NullString `json:"nonce"`
-	ExpiresAt     time.Time      `json:"expires_at"`
+	Code                string         `json:"code"`
+	ClientID            int64          `json:"client_id"`
+	RedirectUri         string         `json:"redirect_uri"`
+	Sub                 string         `json:"sub"`
+	Scope               sql.NullString `json:"scope"`
+	CodeChallenge       sql.NullString `json:"code_challenge"`
+	CodeChallengeMethod sql.NullString `json:"code_challenge_method"`
+	Nonce               sql.NullString `json:"nonce"`
+	ExpiresAt           time.Time      `json:"expires_at"`
 }
 
 func (q *Queries) CreateAuthCode(ctx context.Context, arg CreateAuthCodeParams) (AuthCode, error) {
@@ -36,6 +37,7 @@ func (q *Queries) CreateAuthCode(ctx context.Context, arg CreateAuthCodeParams) 
 		arg.Sub,
 		arg.Scope,
 		arg.CodeChallenge,
+		arg.CodeChallengeMethod,
 		arg.Nonce,
 		arg.ExpiresAt,
 	)
@@ -51,12 +53,13 @@ func (q *Queries) CreateAuthCode(ctx context.Context, arg CreateAuthCodeParams) 
 		&i.CreatedAt,
 		&i.ExpiresAt,
 		&i.Used,
+		&i.CodeChallengeMethod,
 	)
 	return i, err
 }
 
 const getAuthCode = `-- name: GetAuthCode :one
-SELECT code, client_id, redirect_uri, sub, scope, code_challenge, nonce, created_at, expires_at, used FROM auth_codes 
+SELECT code, client_id, redirect_uri, sub, scope, code_challenge, nonce, created_at, expires_at, used, code_challenge_method FROM auth_codes 
 WHERE code = $1 AND expires_at > now()
 `
 
@@ -74,6 +77,7 @@ func (q *Queries) GetAuthCode(ctx context.Context, code string) (AuthCode, error
 		&i.CreatedAt,
 		&i.ExpiresAt,
 		&i.Used,
+		&i.CodeChallengeMethod,
 	)
 	return i, err
 }

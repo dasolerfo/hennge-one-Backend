@@ -29,14 +29,10 @@ func (server *Server) DisplayLoginPage(c *gin.Context) {
 }
 
 type LoginPostHandlerRequest struct {
-	Email        string `form:"email" binding:"required,email"`
-	Password     string `form:"password" binding:"required"`
-	Scope        string `form:"scope" binding:"required"`
-	ResponseType string `form:"response_type" binding:"required"`
-	RedirectUri  string `form:"redirect_uri" binding:"required"`
-	State        string `form:"state"`
-	ClintId      string `form:"client_id" binding:"required"`
-	Prompt       string `form:"prompt"`
+	Email    string `form:"email" binding:"required,email"`
+	Password string `form:"password" binding:"required"`
+	// The original authorization request, replayed to /authorize after login.
+	AuthorizeGetHandlerRequest
 }
 
 func (server *Server) LoginPostHandler(c *gin.Context) {
@@ -64,7 +60,7 @@ func (server *Server) LoginPostHandler(c *gin.Context) {
 	session.Set(StateCode, req.State)
 	session.Save()
 
-	c.Redirect(302, "/authorize?scope="+req.Scope+"&response_type="+req.ResponseType+"&redirect_uri="+req.RedirectUri+"&state="+req.State+"&client_id="+req.ClintId+"&prompt="+req.Prompt)
+	c.Redirect(302, "/authorize?"+req.AuthorizeGetHandlerRequest.query().Encode())
 
 }
 

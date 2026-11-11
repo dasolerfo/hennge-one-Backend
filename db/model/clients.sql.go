@@ -13,16 +13,22 @@ import (
 )
 
 const createClient = `-- name: CreateClient :one
-INSERT INTO clients (client_source, client_name, client_secret, redirect_uris)
-VALUES ($1, $2, $3, $4)
-RETURNING id, client_source, client_name, client_secret, redirect_uris, created_at
+INSERT INTO clients (
+    client_source, client_name, client_secret, redirect_uris,
+    client_type, token_endpoint_auth_method, grant_types, require_pkce
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+RETURNING id, client_source, client_name, client_secret, redirect_uris, created_at, client_type, token_endpoint_auth_method, grant_types, require_pkce
 `
 
 type CreateClientParams struct {
-	ClientSource string   `json:"client_source"`
-	ClientName   string   `json:"client_name"`
-	ClientSecret string   `json:"client_secret"`
-	RedirectUris []string `json:"redirect_uris"`
+	ClientSource            string   `json:"client_source"`
+	ClientName              string   `json:"client_name"`
+	ClientSecret            string   `json:"client_secret"`
+	RedirectUris            []string `json:"redirect_uris"`
+	ClientType              string   `json:"client_type"`
+	TokenEndpointAuthMethod string   `json:"token_endpoint_auth_method"`
+	GrantTypes              []string `json:"grant_types"`
+	RequirePkce             bool     `json:"require_pkce"`
 }
 
 func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Client, error) {
@@ -31,6 +37,10 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Cli
 		arg.ClientName,
 		arg.ClientSecret,
 		pq.Array(arg.RedirectUris),
+		arg.ClientType,
+		arg.TokenEndpointAuthMethod,
+		pq.Array(arg.GrantTypes),
+		arg.RequirePkce,
 	)
 	var i Client
 	err := row.Scan(
@@ -40,6 +50,10 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Cli
 		&i.ClientSecret,
 		pq.Array(&i.RedirectUris),
 		&i.CreatedAt,
+		&i.ClientType,
+		&i.TokenEndpointAuthMethod,
+		pq.Array(&i.GrantTypes),
+		&i.RequirePkce,
 	)
 	return i, err
 }
@@ -54,7 +68,7 @@ func (q *Queries) DeleteClient(ctx context.Context, id int64) error {
 }
 
 const getClientByID = `-- name: GetClientByID :one
-SELECT id, client_source, client_name, client_secret, redirect_uris, created_at FROM clients
+SELECT id, client_source, client_name, client_secret, redirect_uris, created_at, client_type, token_endpoint_auth_method, grant_types, require_pkce FROM clients
 WHERE id = $1
 `
 
@@ -68,12 +82,16 @@ func (q *Queries) GetClientByID(ctx context.Context, id int64) (Client, error) {
 		&i.ClientSecret,
 		pq.Array(&i.RedirectUris),
 		&i.CreatedAt,
+		&i.ClientType,
+		&i.TokenEndpointAuthMethod,
+		pq.Array(&i.GrantTypes),
+		&i.RequirePkce,
 	)
 	return i, err
 }
 
 const getClientBysource = `-- name: GetClientBysource :one
-SELECT id, client_source, client_name, client_secret, redirect_uris, created_at FROM clients
+SELECT id, client_source, client_name, client_secret, redirect_uris, created_at, client_type, token_endpoint_auth_method, grant_types, require_pkce FROM clients
 WHERE client_source = $1
 `
 
@@ -87,12 +105,16 @@ func (q *Queries) GetClientBysource(ctx context.Context, clientSource string) (C
 		&i.ClientSecret,
 		pq.Array(&i.RedirectUris),
 		&i.CreatedAt,
+		&i.ClientType,
+		&i.TokenEndpointAuthMethod,
+		pq.Array(&i.GrantTypes),
+		&i.RequirePkce,
 	)
 	return i, err
 }
 
 const listClients = `-- name: ListClients :many
-SELECT id, client_source, client_name, client_secret, redirect_uris, created_at FROM clients
+SELECT id, client_source, client_name, client_secret, redirect_uris, created_at, client_type, token_endpoint_auth_method, grant_types, require_pkce FROM clients
 ORDER BY id
 `
 
@@ -112,6 +134,10 @@ func (q *Queries) ListClients(ctx context.Context) ([]Client, error) {
 			&i.ClientSecret,
 			pq.Array(&i.RedirectUris),
 			&i.CreatedAt,
+			&i.ClientType,
+			&i.TokenEndpointAuthMethod,
+			pq.Array(&i.GrantTypes),
+			&i.RequirePkce,
 		); err != nil {
 			return nil, err
 		}
@@ -128,20 +154,28 @@ func (q *Queries) ListClients(ctx context.Context) ([]Client, error) {
 
 const updateClient = `-- name: UpdateClient :one
 UPDATE clients SET
-  client_source = COALESCE($1, client_source),
-  client_name   = COALESCE($2, client_name),
-  client_secret = COALESCE($3, client_secret),
-  redirect_uris = COALESCE($4::text[], redirect_uris)
-WHERE id = $5
-RETURNING id, client_source, client_name, client_secret, redirect_uris, created_at
+  client_source              = COALESCE($1, client_source),
+  client_name                = COALESCE($2, client_name),
+  client_secret              = COALESCE($3, client_secret),
+  redirect_uris              = COALESCE($4::text[], redirect_uris),
+  client_type                = COALESCE($5, client_type),
+  token_endpoint_auth_method = COALESCE($6, token_endpoint_auth_method),
+  grant_types                = COALESCE($7::text[], grant_types),
+  require_pkce               = COALESCE($8, require_pkce)
+WHERE id = $9
+RETURNING id, client_source, client_name, client_secret, redirect_uris, created_at, client_type, token_endpoint_auth_method, grant_types, require_pkce
 `
 
 type UpdateClientParams struct {
-	ClientSource sql.NullString `json:"client_source"`
-	ClientName   sql.NullString `json:"client_name"`
-	ClientSecret sql.NullString `json:"client_secret"`
-	RedirectUris []string       `json:"redirect_uris"`
-	ID           int64          `json:"id"`
+	ClientSource            sql.NullString `json:"client_source"`
+	ClientName              sql.NullString `json:"client_name"`
+	ClientSecret            sql.NullString `json:"client_secret"`
+	RedirectUris            []string       `json:"redirect_uris"`
+	ClientType              sql.NullString `json:"client_type"`
+	TokenEndpointAuthMethod sql.NullString `json:"token_endpoint_auth_method"`
+	GrantTypes              []string       `json:"grant_types"`
+	RequirePkce             sql.NullBool   `json:"require_pkce"`
+	ID                      int64          `json:"id"`
 }
 
 func (q *Queries) UpdateClient(ctx context.Context, arg UpdateClientParams) (Client, error) {
@@ -150,6 +184,10 @@ func (q *Queries) UpdateClient(ctx context.Context, arg UpdateClientParams) (Cli
 		arg.ClientName,
 		arg.ClientSecret,
 		pq.Array(arg.RedirectUris),
+		arg.ClientType,
+		arg.TokenEndpointAuthMethod,
+		pq.Array(arg.GrantTypes),
+		arg.RequirePkce,
 		arg.ID,
 	)
 	var i Client
@@ -160,6 +198,10 @@ func (q *Queries) UpdateClient(ctx context.Context, arg UpdateClientParams) (Cli
 		&i.ClientSecret,
 		pq.Array(&i.RedirectUris),
 		&i.CreatedAt,
+		&i.ClientType,
+		&i.TokenEndpointAuthMethod,
+		pq.Array(&i.GrantTypes),
+		&i.RequirePkce,
 	)
 	return i, err
 }

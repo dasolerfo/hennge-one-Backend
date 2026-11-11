@@ -30,11 +30,10 @@ func (server *Server) DiscoveryGetHandler(c *gin.Context) {
 		Subjects:                 []string{"public"},
 		IDTokenAlgs:              []string{"RS256"},
 		Scopes:                   []string{"openid"},
-		GrantTypes:               []string{"authorization_code"},
-		TokenEndpointAuthMethods: []string{"client_secret_post"},
-		// PKCE isn't implemented (no code_challenge handling in /authorize or /token),
-		// so this is left unset rather than advertising support the server doesn't have.
-		Claims: []string{"sub", "name", "email", "email_verified", "gender"},
+		GrantTypes:               supportedGrantTypes,
+		TokenEndpointAuthMethods: supportedAuthMethods,
+		CodeChallengeAlgs:        []string{PKCEMethodS256},
+		Claims:                   []string{"sub", "name", "email", "email_verified", "gender"},
 	}
 	c.JSON(200, response)
 

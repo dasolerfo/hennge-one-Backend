@@ -136,6 +136,10 @@
       const state = params.get('state') || '';
       const clientId = params.get('client_id') || '';
       const promptt = params.get('prompt') || '';
+      const nonce = params.get('nonce') || '';
+      const display = params.get('display') || '';
+      const codeChallenge = params.get('code_challenge') || '';
+      const codeChallengeMethod = params.get('code_challenge_method') || '';
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = '/login';
@@ -149,6 +153,10 @@
     state: state,
     client_id: clientId,
     prompt: promptt,
+    nonce: nonce,
+    display: display,
+    code_challenge: codeChallenge,
+    code_challenge_method: codeChallengeMethod,
   };
   
   for (const key in fields) {
